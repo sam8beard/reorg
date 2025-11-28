@@ -4,8 +4,10 @@
     </picture>
 </div>
 
-<h4 align="center">
-    ReOrganize intelligently.
-    <br/>
+<h2 align="center">
+    ReOrganize Intelligently.
+</h2>
+
+<h3>
     A tool that leverages customizable, user-defined, rule-based sorting. Organize cluttered files and directories with ease.
-</h4>
+</h3>
