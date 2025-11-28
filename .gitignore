@@ -40,3 +40,9 @@ vendor/
 
 # Project notes
 notes/
+
+# Vim sessions
+.vim
+
+# Dist
+dist/
