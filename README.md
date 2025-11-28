@@ -8,6 +8,6 @@
     ReOrganize Intelligently.
 </h2>
 
-<h3>
+<h3 align="center">
     A tool that leverages customizable, user-defined, rule-based sorting. Organize cluttered files and directories with ease.
 </h3>
