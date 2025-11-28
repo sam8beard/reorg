@@ -1,6 +1,11 @@
-# ReOrg
+<div align="center">
+    <picture>
+        <img src="reorg-logo.png" alt="reorg-logo" width="250"/>
+    </picture>
+</div>
 
-<img src="reorg-logo.png" alt="reorg-logo" width="200"/>
-An easy-to-use file organizer that leverages user-defined, rule-based sorting.
-
-
+<h4 align="center">
+    ReOrganize intelligently.
+    <br/>
+    A tool that leverages customizable, user-defined, rule-based sorting. Organize cluttered files and directories with ease.
+</h4>
