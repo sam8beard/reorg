@@ -9,5 +9,5 @@
 </h2>
 
 <h3 align="center">
-    A tool that leverages customizable, user-defined, rule-based sorting. Organize cluttered files and directories with ease.
+    A tool that leverages customizable, rule-based sorting to organize cluttered files and directories with ease.
 </h3>
