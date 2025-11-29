@@ -2,17 +2,19 @@ package main
 
 import (
 	"embed"
+	"fmt"
+	// "github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"github.com/sam8beard/reorg/cmd/server/utils"
 	"io/fs"
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 /* Development vars */
 var devDir string
-var devFS http.Dir
-var devPort string
 
 /* Production vars */
 var prodDir string
@@ -20,83 +22,96 @@ var prodFS fs.FS
 
 //go:embed "dist/*"
 var dist embed.FS
-var prodPort string
 
 /*
-Runs the development flow using the specified port and file system
+Runs the development flow
 */
-func runDev(port string, fSys http.Dir) {
+func runDev() {
+	// Configure logger for debugging
+	log.SetFlags(log.Lshortfile)
 
-	if err := http.ListenAndServe(
-		port, http.FileServer(fSys),
-	); err != nil {
-		log.Panicf("could not serve frontend from Go server: %v", err)
+	// Load path to frontend files for development
+	devDir = os.Getenv("DEV_FRONTEND_DIR")
+	port := ":8080"
+
+	// Confirm development environment is correct
+	if _, err := os.Stat(devDir); err != nil {
+		msg := fmt.Sprintf("development directory is invalid: %v", err)
+		log.Fatal(msg)
 	}
+
+	// Create router with all handlers
+	router := utils.BuildRouterDev()
+	// Create server
+	srv := &http.Server{
+		Handler:      router,
+		Addr:         port,
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+
+	// Run
+	if err := srv.ListenAndServe(); err != nil {
+		msg := fmt.Sprintf("could not serve frontend from Go server: %v", err)
+		log.Fatal(msg)
+	}
+
 	log.Printf("listening on port %s", port)
 }
 
 /*
-Runs the production flow using the specified port and file system
+Runs the production flow
 */
-func runProd(port string, fSys fs.FS) {
-	// Run production
-	if err := http.ListenAndServe(
-		port, http.FileServerFS(fSys),
-	); err != nil {
-		log.Panicf("could not serve frontend from Go server: %v", err)
-	}
-}
-func main() {
-	// Load environment
-	if err := godotenv.Load(); err != nil {
-		log.Panicf("could not load environment: %v", err)
-	}
-
-	// Load path to frontend files for development
-	devDir = os.Getenv("DEV_FRONTEND_DIR")
-	devFS = http.Dir(devDir)
-	devPort = ":8080"
-
-	// Load path to dist files for production
-	prodDir = os.Getenv("DIST_DIR")
-	// Get dist subtree
-	distSub, _ := fs.Sub(dist, "dist")
-	prodFS = fs.FS(distSub)
-	prodPort = ":8081"
-
+func runProd() {
 	// Configure logger for debugging
 	log.SetFlags(log.Lshortfile)
 
-	// Confirm development environment is correct
-	if _, err := os.Stat(devDir); err != nil {
-		log.Fatalf("development directory is invalid: %v", err)
-	}
+	// Load path to dist files for production
+	prodDir = os.Getenv("DIST_DIR")
+	// Get dist subtree if we want to deploy using
+	// a binary
+	//distSub, _ := fs.Sub(dist, "dist")
+	//prodSub := http.FS(distSub)
+	port := ":8081"
 
 	// Confirm production environment is correct
 	if _, err := os.Stat(prodDir); err != nil {
-		log.Fatalf("development directory is invalid: %v", err)
+		msg := fmt.Sprintf("production directory is invalid: %v", err)
+		log.Fatal(msg)
 	}
 
-	runDev(devPort, devFS)
-	//runProd(prodPort, prodFS)
+	// Create router with all handlers and SPA fallback
+	router := utils.BuildRouter()
+	// Create server
+	srv := &http.Server{
+		Handler:      router,
+		Addr:         port,
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
 
-	/*
-
-		// Run development
-		if err := http.ListenAndServe(
-			devPort, http.FileServer(devFS),
-		); err != nil {
-			log.Panicf("could not serve frontend from Go server: %v", err)
-		}
-		log.Printf("listening on port %s", port)
-
-	*/
-
-	// Run production
-	//	if err := http.ListenAndServe(
-	//		prodPort, http.FileServerFS(prodFS),
-	//	); err != nil {
-	//		log.Panicf("could not serve frontend from Go server: %v", err)
+	// Run
+	if err := srv.ListenAndServe(); err != nil {
+		msg := fmt.Sprintf("could not serve frontend from Go server: %v", err)
+		log.Fatal(msg)
+	}
+	// Create server
+	//	srv := &http.Server{
+	//		Addr: port,
 	//	}
 
+	// Run
+}
+
+func main() {
+	// Load environment variables
+	if err := godotenv.Load(); err != nil {
+		log.Panicf("could not load environment variables: %v", err)
+	}
+
+	// Initialize router
+	// Add all handlers to router
+
+	runDev()
+	//runProd()
 }

@@ -3,6 +3,11 @@ const distPath = process.env.DIST_DIR;
 
 export default defineConfig({
 	server: {
+		cors: { 
+			origin: ['https://localhost:5137'],
+			methods: ['GET', 'POST', 'DELETE', 'PUT'],
+			allowedHeaders: ['Content-Type'],
+		},
 		proxy: {
 			// Proxy for /api requests
 			'/api': {
@@ -13,8 +18,8 @@ export default defineConfig({
 				// Remove prefix of request for correct 
 				// resolution on the backend server
 				rewrite: (path) => path.replace(/^\/api/, ''),
-			}
-		}
+			},
+		},
 	},
 
 	build: { 

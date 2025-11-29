@@ -1,15 +1,26 @@
-import './style.css'
-import reorgLogo from '/reorg-logo.png'
+import cors from 'cors';
+import './style.css';
+import reorgLogo from '/reorg-logo.png';
+import { fetchHealth } from './api';
+import { renderHomeView } from './views/Home.js';
+import { awaitServer } from './api/health.js'
+//import { renderLoadingView } from './views/Loading.js'
 
-document.querySelector('#app').innerHTML = `
-	<div class='banner'>
-		<div class='welcome-message'>
-			<img src="${reorgLogo}" class="logo vanilla" alt="ReOrg logo" />
-			<h1> welcome </h1>
-		</div>
-	</div> 
-	<div>
-	</div>
+// Renders initial view and setup event listeners
+async function init() {
+	// Check backend server health
+	//renderLoadingView();
+	await awaitServer();
 
-`
 
+	// Render homepage
+	renderHomeView();
+
+
+	/*
+	 * 
+	 * Attach event listeners
+	 *
+	 */
+}
+init();

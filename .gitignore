@@ -42,3 +42,7 @@ notes/
 
 # Vim sessions
 .vim
+
+# Executables
+reorg-dev
+reorg-prod
