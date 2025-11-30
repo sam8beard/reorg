@@ -1,11 +1,10 @@
 import './style.css';
-import App from './App.js';
+import App from './App';
 
 /*
+ * Entry point
  *
- * Root of application
- *
- * Creates initial app view and initializes any values needed 
- * for state
+ * Initializes root of application
  */
-App();
+const root = document.getElementById('root');
+App(root);
