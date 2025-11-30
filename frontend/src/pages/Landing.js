@@ -10,8 +10,7 @@ export default function Landing(root) {
 
 		<div class='banner'>
 			<div class='welcome-message'>
-				<img src="${reorgLogo}" class="logo vanilla" alt="ReOrg logo" />
-				<h1> welcome </h1>
+				<img src="${reorgLogo}" class="reorg-logo" alt="ReOrg logo" />
 			</div>
 				<!-- 
 				These will be buttons that render the homepage and
@@ -21,9 +20,16 @@ export default function Landing(root) {
 				For now, we will just render a default homepage with dummy user data.
 				-->
 			<div class='actions'>
-				<button id="login-btn">Log In</button>
-				<button id="signup-btn">Sign Up</button>
+				<div class='account-options'>
+					<button id="login-btn">Log In</button>
+					<button id="signup-btn">Sign Up</button>
+				</div>
+				<div class='no-account'>
+					<button id='no-acc-btn'>Use without an account</button>
+				</div>
 			<div>
+			
+			
 		</div> 
 	`;
 

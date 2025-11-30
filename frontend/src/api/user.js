@@ -1,6 +1,7 @@
 import axios from 'axios';
 const DEV_API_BASE = "http://localhost:5173/api";
 
+/* Fetch user account from backend */
 export async function fetchUser(user) { 
 	var userURL = DEV_API_BASE + "/user";
 	console.log(userURL);
@@ -11,9 +12,9 @@ export async function fetchUser(user) {
 				username: username,
 				password: password,
 		});
-		console.log(response.data);
 		return response.data;
-	} catch (err) { 
+	} catch (err) {
+		// Return error message for login attempt
 		if (err.response) { 
 			console.error(err)
 			return { error: err.response.data.error || 'Unknown error' };

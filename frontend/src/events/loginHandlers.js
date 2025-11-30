@@ -55,9 +55,13 @@ async function onLoginSubmit(root, e) {
 		"password": password,
 	};
 	
+	// Fetch user from backend
 	const userData = await fetchUser(loginInfo);
+	
+	// If user does not exist, update state to notify login page and rerender with message
 	if (userData.error) {
 		store.loginError = userData.error
+	// If user does exist, show home page for respective user
 	} else {
 		showHome(userData)
 	}

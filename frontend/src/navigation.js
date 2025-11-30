@@ -2,7 +2,7 @@
 import { store, subscribe } from './state.js';
 import { Landing, Signup, Login, Home } from './pages';
 
-function renderPage() { 
+export function renderPage() { 
 	const root = document.getElementById('root');
 	switch (store.currentPage) { 
 		case 'landing':
@@ -56,8 +56,8 @@ export function showHome(userData) {
 	logPageView('home');
 	store.user = userData;
 	store.isLoggedIn = true;
-	store.currentPage = 'home';
 	store.loginError = null;
+	store.currentPage = 'home';
 	/*
 	 *
 	 * Change UI based on user and state

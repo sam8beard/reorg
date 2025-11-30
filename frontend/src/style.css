@@ -13,6 +13,20 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+#no-acc-btn {
+	border: none;
+    	background: none;
+    	font: inherit;
+    	color: inherit;
+	margin: 1em;
+    	cursor: pointer;
+}
+
+#no-acc-btn:hover { 
+  	filter: drop-shadow(0 0 1em #f7df1eaa);
+  	will-change: filter;
+  	transition: filter 300ms;
+} 
 a {
   font-weight: 500;
   color: #646cff;
@@ -36,6 +50,18 @@ body {
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+}
+
+.reorg-logo { 
+  	height: 15em;
+  	padding: 0.5em;
+  	will-change: filter;
+	-moz-transition:all 1s ease;
+
+} 
+.reorg-logo:hover,
+.reorg-logo:focus {
+	-moz-transform:scale(1.3);
 }
 
 .logo {
