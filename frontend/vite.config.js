@@ -4,7 +4,7 @@ const distPath = process.env.DIST_DIR;
 export default defineConfig({
 	server: {
 		cors: { 
-			origin: ['https://localhost:5137'],
+			origin: ['http://localhost:5137'],
 			methods: ['GET', 'POST', 'DELETE', 'PUT'],
 			allowedHeaders: ['Content-Type'],
 		},

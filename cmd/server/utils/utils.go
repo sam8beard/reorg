@@ -56,9 +56,10 @@ func BuildRouterDev() *mux.Router {
 	// Initialize router
 	r := mux.NewRouter()
 
-	// Add health check
+	// Health check
 	r.HandleFunc("/health", api.HealthHandler).Methods("GET")
-
+	// Get user data
+	r.HandleFunc("/user", api.UserHandler).Methods("POST")
 	/*
 		Add all handlers here...
 	*/
@@ -75,7 +76,7 @@ func BuildRouter() *mux.Router {
 
 	// Add health check
 	r.HandleFunc("/health", api.HealthHandler).Methods("GET")
-
+	r.HandleFunc("/user", api.UserHandler).Methods("POST")
 	/*
 		Add all handlers here...
 	*/

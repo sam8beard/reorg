@@ -109,9 +109,6 @@ func main() {
 		log.Panicf("could not load environment variables: %v", err)
 	}
 
-	// Initialize router
-	// Add all handlers to router
-
 	runDev()
 	//runProd()
 }

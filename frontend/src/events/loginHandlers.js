@@ -1,21 +1,24 @@
-/* 
+/*
  * Handlers and utils for log in button on landing page
  */
-import { showLoginPage } from '../navigation.js';
-
+import { showLogin, showHome } from '../navigation.js';
+import { fetchUser } from '../api';
+import { store } from '../state.js';
 /*
  * Adds event for login button click on landing page.
  *
  * Shows login page
  */
 export function attachLoginPageHandler(button, root) {
-	button.addEventListener('click', () => showLoginPage(root));
+	button.addEventListener('click', () => showLogin());
 }
 /*
- * Adds event for login button on login page
+ * Adds event for login form on login page
  */
-export function attachLoginHandler(button, root) {
-	button.addEventListener('click', () => onLoginClick(root));
+export function attachLoginHandler(form, root) {
+	form.addEventListener('submit', (e) => {
+		onLoginSubmit(root, e);
+	});
 }
 
 /*
@@ -23,12 +26,39 @@ export function attachLoginHandler(button, root) {
  *
  * Fetches user data and uses state to display homepage
  */
-export function onLoginClick(root) {
-	// grab login field information from root
+async function onLoginClick(root) {
+	// Grab login field information from root
+	// const username = root.querySelector('#username').value;
+	// const password = root.querySelector('#password').value;
 	//
-	// fetch user data (and state?) 
+	// Fetch user data from backend 
 	//
 	// pass user data and state to showHomePage()
 	//
-	// showHomePage(root, userData);
+	// Update store and show page
+	// showHome(userData);
+}
+
+/*
+ * Handles login submit
+ *
+ * Fetches user data and uses state to display homepage
+ */
+async function onLoginSubmit(root, e) { 
+	e.preventDefault();
+	const form = e.target;
+	const username = form.elements.username.value;
+	const password = form.elements.password.value;
+	
+	const loginInfo = {
+		"username": username,
+		"password": password,
+	};
+	
+	const userData = await fetchUser(loginInfo);
+	if (userData.error) {
+		store.loginError = userData.error
+	} else {
+		showHome(userData)
+	}
 }

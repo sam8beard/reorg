@@ -1,8 +1,7 @@
 import './style.css';
 import { awaitServer } from './api';
 import reorgLogo from '/reorg-logo.png';
-import { Landing } from './pages';
-
+import { showLanding } from './navigation.js'
 /*
  * Root of application
  *
@@ -10,9 +9,8 @@ import { Landing } from './pages';
  */
 export default function App(root) {
 	// Ensure server is healthy
-	awaitServer().then(() => {
+	awaitServer().finally(() => {
 		console.log("Server healthy");
-	}).finally(() => {
-		Landing(root)
+		showLanding();
 	});
 }

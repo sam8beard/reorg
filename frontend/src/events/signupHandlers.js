@@ -1,7 +1,7 @@
 /* 
  * Handlers and utils for sign up button on landing page
  */
-import { showSignupPage } from '../navigation.js';
+import { showSignup } from '../navigation.js';
 
 /*
  * Adds event for sign up button click on landing page.
@@ -9,7 +9,7 @@ import { showSignupPage } from '../navigation.js';
  * Shows sign up page
  */
 export function attachSignupPageHandler(button, root) {
-	button.addEventListener('click',() => showSignupPage(root));
+	button.addEventListener('click',() => showSignup());
 }
 
 /*
@@ -23,6 +23,11 @@ export function attachSignupHandler(button, root) {
  *
  * Create account....etc. 
  */
-export function onSignupClick(root) { 
-
+export async function onSignupClick(root) { 
+	// Grab sign up field information from root
+	// const username = root.querySelector('#username').value;
+	// const password = root.querySelector('#password').value;
+	//
+	// Validate, check if user exists, create user, etc.
+	// 
 }
