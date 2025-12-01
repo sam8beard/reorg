@@ -34,10 +34,9 @@ export default function Login(root) {
 	`;
 
 	// If login error is not null, render error message
-	if (store.loginError) {
-		const errEl = root.querySelector('#login-error');
-		errEl.textContent = "Wrong username or password. Try again or create an account.";
-	}
+	const errEl = root.querySelector('#login-error');
+	errEl.textContent = (store.loginError) ? "Wrong username or password. Try again.": ""; 
+
 
 	// Attach handler for login
 	const loginForm = root.querySelector('#login-form');

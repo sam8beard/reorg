@@ -1,6 +1,6 @@
 /* Wrapper functions for showing a page based on state and user */
 import { store, subscribe } from './state.js';
-import { Landing, Signup, Login, Home } from './pages';
+import { Landing, Signup, Login, Home, Organize } from './pages';
 
 export function renderPage() { 
 	const root = document.getElementById('root');
@@ -17,7 +17,8 @@ export function renderPage() {
 		case 'home': 
 			Home(root, store.user);
 			break;
-
+		case 'organize':
+			Organize(root, store.user);
 		/*
 		 * Additional pages go here
 		 *
@@ -32,28 +33,28 @@ renderPage();
 
 /* Show landing page */
 export function showLanding() { 
-	logPageView('landing');
+	logPageVisit('landing');
 	store.currentPage = 'landing';
 }
 
 /* Show sign up page */
 export function showSignup() {
 	// notifiy server on page visit
-	logPageView('signup');
+	logPageVisit('signup');
 	store.currentPage = 'signup';
 }
 
 /* Show log in page */
 export function showLogin() { 
 	// notify server on page visit
-	logPageView('login');
+	logPageVisit('login');
 	store.currentPage = 'login';
 }
 
-/* Show homepage */
+/* Show home page */
 export function showHome(userData) { 
 	// notify server on page visit
-	logPageView('home');
+	logPageVisit('home');
 	store.user = userData;
 	store.isLoggedIn = true;
 	store.loginError = null;
@@ -65,9 +66,16 @@ export function showHome(userData) {
 	 */
 }
 
+/* Show organize page */
+export function showOrganize() { 
+	// notify server on page visit
+	logPageVisit('organize');
+	store.currentPage = 'organize';
+}
+
 /* Util for logging page visit */
-function logPageView(pageName) { 
-	console.log(`Page viewed: ${pageName}`);
+function logPageVisit(pageName) { 
+	console.log(`Page visit: ${pageName}`);
 	
 	/*
 	 * Add optional reactions here...

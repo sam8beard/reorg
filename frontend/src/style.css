@@ -13,7 +13,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-#no-acc-btn {
+#guest-btn {
 	border: none;
     	background: none;
     	font: inherit;
@@ -22,7 +22,7 @@
     	cursor: pointer;
 }
 
-#no-acc-btn:hover { 
+#guest-btn:hover { 
   	filter: drop-shadow(0 0 1em #f7df1eaa);
   	will-change: filter;
   	transition: filter 300ms;

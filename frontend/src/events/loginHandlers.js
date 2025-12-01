@@ -1,9 +1,10 @@
 /*
- * Handlers and utils for log in button on landing page
+ * Handlers and utils for log in related actions
  */
 import { showLogin, showHome } from '../navigation.js';
 import { fetchUser } from '../api';
 import { store } from '../state.js';
+
 /*
  * Adds event for login button click on landing page.
  *

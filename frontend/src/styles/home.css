@@ -1,0 +1,17 @@
+/* Eventually we'll use tailwind, this is just to see the spacing for now*/
+
+#user-info {
+	padding: 0.5em;
+} 
+#dashboard-header-container {
+	display: flex;
+	justify-content: flex-start;
+	margin-bottom: -1em;
+}
+
+#home-dashboard {
+	border: solid 0.1em white;
+	border-radius: 0.8em;
+	height: 10em;
+	width : 40em;
+} 
