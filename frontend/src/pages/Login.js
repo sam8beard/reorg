@@ -35,7 +35,7 @@ export default function Login(root) {
 
 	// If login error is not null, render error message
 	const errEl = root.querySelector('#login-error');
-	errEl.textContent = (store.loginError) ? "Wrong username or password. Try again.": ""; 
+	errEl.textContent = (store.loginError) ? "Wrong username or password. Try again." : ""; 
 
 
 	// Attach handler for login
