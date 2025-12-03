@@ -24,6 +24,13 @@ export async function dropHandler(e, preview) {
 }
 
 /*
+ * Handle uploaded files via default input
+ */
+export async function fileInputHandler(e, preview) {
+	displayFiles(e.target.files, preview);
+}
+
+/*
  * Display preview for files uploaded
  */
 function displayFiles(files, preview) {
@@ -33,3 +40,4 @@ function displayFiles(files, preview) {
 		preview.appendChild(li);
 	}
 } 
+
