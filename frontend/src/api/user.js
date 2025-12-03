@@ -6,8 +6,9 @@ export async function fetchUser(user) {
 	var userURL = DEV_API_BASE + "/user";
 	console.log(userURL);
 	try {
-		username = user.username
-		password = user.password
+		console.log(user);
+		const username = user.username
+		const password = user.password
 		const response = await axios.post(userURL, {
 				username: username,
 				password: password,
