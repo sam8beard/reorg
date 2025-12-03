@@ -5,9 +5,9 @@
 </div>
 
 <h2 align="center">
-    ReOrganize Intelligently.
+    ReOrg
 </h2>
 
 <h3 align="center">
-    A tool that leverages customizable, rule-based sorting to organize cluttered files and directories with ease.
+    A tool to organize cluttered files and directories with or without the help of AI. Reorganize on your own terms.
 </h3>
