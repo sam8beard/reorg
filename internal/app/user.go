@@ -14,12 +14,15 @@ type LoginForm struct {
 	Password string `json:"password"`
 }
 
-type UserData struct {
-}
+//type UserData struct {
+//}
 
 // dummy data for testing
 var dummyUsername = "username"
 var dummyPassword = "password"
+
+var dummyUsername2 = "muel"
+var dummyPassword2 = "angel"
 
 /*
 Get user data on login
@@ -83,7 +86,19 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 				},
 			}
 			return validUser, nil
-		}
+		// Second dummy user
+		} else if u == dummyUsername2 && p == dummyPassword2 { 
+			
+			validUser := models.User{
+				UserID: models.Identity{
+					ID:       5678,
+					Username: username,
+					Email:    "user@user.com",
+				},
+			}
+			return validUser, nil
+
+		} 
 		return models.User{}, fmt.Errorf("user does not exist")
 	}(username, password)
 
