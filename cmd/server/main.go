@@ -1,7 +1,6 @@
 package main
 
 import (
-	"embed"
 	"fmt"
 	// "github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -20,8 +19,6 @@ var devDir string
 var prodDir string
 var prodFS fs.FS
 
-//go:embed "dist/*"
-var dist embed.FS
 
 /*
 Runs the development flow
@@ -33,13 +30,13 @@ func runDev() {
 	// Load path to frontend files for development
 	devDir = os.Getenv("DEV_FRONTEND_DIR")
 	port := ":8080"
-
+	log.Println(devDir)
 	// Confirm development environment is correct
 	if _, err := os.Stat(devDir); err != nil {
 		msg := fmt.Sprintf("development directory is invalid: %v", err)
 		log.Fatal(msg)
 	}
-
+	
 	// Create router with all handlers
 	router := utils.BuildRouterDev()
 	// Create server
