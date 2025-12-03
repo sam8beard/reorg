@@ -41,3 +41,13 @@ function displayFiles(files, preview) {
 	}
 } 
 
+/*
+ * Handles file upload form submission
+ */
+export async function onFileSubmit(e) { 
+	e.preventDefault();	
+	/* Send files to backend endpoint */
+	const form = e.target;
+	
+}
+

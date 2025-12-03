@@ -2,7 +2,7 @@
  * Organize page
  */
 import { store } from '../state.js';
-import { dropHandler, fileInputHandler } from '../events';
+import { dropHandler, fileInputHandler, onFileSubmit } from '../events';
 
 export default function Organize(root, userData) { 
 	console.log(userData)
@@ -28,10 +28,18 @@ export default function Organize(root, userData) {
 					</div>
 				</form>
 				-->
-				<label  style='border: 0.05em white solid' id='drop-zone'>
-					Drop files here, or click to upload.
-					<input style="display: none;" id='file-input' type='file' multiple />
-				</label>
+				<form name='upload-form'>
+					<div>
+						<label  style='border: 0.05em white solid' id='drop-zone'>
+							Drop files here, or click to upload.
+							<input style="display: none;" id='file-input' type='file' multiple />
+						</label>
+					</div>
+
+					<div>
+						<button type='submit'>Upload</button>
+					</div>
+				</form> 
 				<!-- 
 				Here is where we will display the preview for all files 
 				uploaded so far
@@ -49,7 +57,7 @@ export default function Organize(root, userData) {
 			e.preventDefault();
 		}
 	});
-	document.addEventListener("dragover", (e) => { 
+	document.addEventListener("dragover", (e) => {
 		if ([...e.dataTransfer.items].some((item) => item.kind === 'file')) {
 			e.preventDefault();
 		}
@@ -65,5 +73,7 @@ export default function Organize(root, userData) {
 	// Prevent default browser behavior for dragover event 
 	dropZone.addEventListener("dragover", (e) => e.preventDefault());
 	// Handle default input 
-	dropZone.addEventListener("change", (e) => fileInputHandler(e, preview));	
+	dropZone.addEventListener("change", (e) => fileInputHandler(e, preview));
+	// Handle form submission 
+
 } 
