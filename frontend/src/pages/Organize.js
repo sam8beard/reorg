@@ -2,6 +2,8 @@
  * Organize page
  */
 import { store } from '../state.js';
+import { dropHandler } from '../events';
+
 export default function Organize(root, userData) { 
 	console.log(userData)
 	// Grab user data if logged in
@@ -54,9 +56,10 @@ export default function Organize(root, userData) {
 	});
 
 	// Here, we'll deal with the behavior of dropping files for the drop target
-	const dropZone = root.getElementById("drop-zone");
+	const dropZone = root.querySelector("#drop-zone");
+	const preview = root.querySelector("#file-preview");
 	// Make sure dropHandler handles multi-file uploads
-	dropZone.addEventListener("drop", dropHandler);
+	dropZone.addEventListener("drop", (e) => dropHandler(e, preview));
 	
 	// Prevent default browser behavior for dragover event 
 	dropZone.addEventListener("dragover", (e) => e.preventDefault());

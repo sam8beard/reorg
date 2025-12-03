@@ -15,5 +15,21 @@ export function attachOrganizePageHandler(button, root) {
 /*
  * Handle uploaded files via drop
  */
-export async function dropHandler(e) { 
+export async function dropHandler(e, preview) { 
+	e.preventDefault();
+	const files = [...e.dataTransfer.items]
+		.map((item) => item.getAsFile())
+		.filter((file) => file);
+	displayFiles(files, preview);
 }
+
+/*
+ * Display preview for files uploaded
+ */
+function displayFiles(files, preview) {
+	for (const file of files) { 
+		const li = document.createElement("li");
+		li.appendChild(document.createTextNode(file.name));
+		preview.appendChild(li);
+	}
+} 
