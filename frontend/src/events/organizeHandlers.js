@@ -12,3 +12,8 @@ export function attachOrganizePageHandler(button, root) {
 	button.addEventListener('click', () => showOrganize());
 }
 
+/*
+ * Handle uploaded files via drop
+ */
+export async function dropHandler(e) { 
+}

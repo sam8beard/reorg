@@ -40,4 +40,24 @@ export default function Organize(root, userData) {
 		</div>
 
 	`;
+
+	// Prevent default browser behavior when dragging and dropping files
+	document.addEventListener("drop", (e) => { 
+		if ([...e.dataTransfer.items].some((item) => item.kind === 'file')) {
+			e.preventDefault();
+		}
+	});
+	document.addEventListener("dragover", (e) => { 
+		if ([...e.dataTransfer.items].some((item) => item.kind === 'file')) {
+			e.preventDefault();
+		}
+	});
+
+	// Here, we'll deal with the behavior of dropping files for the drop target
+	const dropZone = root.getElementById("drop-zone");
+	// Make sure dropHandler handles multi-file uploads
+	dropZone.addEventListener("drop", dropHandler);
+	
+	// Prevent default browser behavior for dragover event 
+	dropZone.addEventListener("dragover", (e) => e.preventDefault());
 } 
