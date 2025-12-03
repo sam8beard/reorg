@@ -2,8 +2,6 @@
  * Organize page
  */
 import { store } from '../state.js';
-import { Organize
-import
 export default function Organize(root, userData) { 
 	console.log(userData)
 	// Grab user data if logged in
