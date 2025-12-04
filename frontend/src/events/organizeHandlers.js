@@ -48,6 +48,25 @@ export async function onFileSubmit(e) {
 	e.preventDefault();	
 	/* Send files to backend endpoint */
 	const form = e.target;
-	
+	const input = form.querySelector("#file-input");
+	const files = input.files;
+
+	// If no files were uploaded 
+	if (!files || files.length === 0) { 
+		// Display some message on DOM 
+		// indicating no files were selected
+		console.log("No files selected");
+		return;
+	}
+
+	const formData = new FormData();
+	for (const file of files) {
+		formData.append("files", file);
+	} 
+
+
+	//const response = await postFileData(formData);
+	const data = await response.json();
+	console.log(data);
 }
 

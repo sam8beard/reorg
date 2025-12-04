@@ -28,7 +28,7 @@ export default function Organize(root, userData) {
 					</div>
 				</form>
 				-->
-				<form name='upload-form'>
+				<form id='upload-form' name='upload-form'>
 					<div>
 						<label  style='border: 0.05em white solid' id='drop-zone'>
 							Drop files here, or click to upload.
@@ -44,7 +44,7 @@ export default function Organize(root, userData) {
 				Here is where we will display the preview for all files 
 				uploaded so far
 				-->
-				<ul id='file-preview'></ul>
+				<ul id='file-preview' style='list-style-type: none;'></ul>
 
 			</div>
 		</div>
@@ -66,7 +66,7 @@ export default function Organize(root, userData) {
 	// Here, we'll deal with the behavior of dropping files for the drop target
 	const dropZone = root.querySelector("#drop-zone");
 	const preview = root.querySelector("#file-preview");
-	const fileInput = root.querySelector("#file-input");
+	const uploadForm = root.querySelector("#upload-form");
 
 	// Make sure dropHandler handles multi-file uploads
 	dropZone.addEventListener("drop", (e) => dropHandler(e, preview));
@@ -74,6 +74,8 @@ export default function Organize(root, userData) {
 	dropZone.addEventListener("dragover", (e) => e.preventDefault());
 	// Handle default input 
 	dropZone.addEventListener("change", (e) => fileInputHandler(e, preview));
+
 	// Handle form submission 
+	uploadForm.addEventListener("submit", (e) => onFileSubmit(e));
 
 } 

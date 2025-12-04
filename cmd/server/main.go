@@ -20,7 +20,7 @@ var devDir string
 var prodDir string
 var prodFS fs.FS
 
-////go:embed "dist/*"
+// //go:embed "dist/*"
 var dist embed.FS
 
 /*
