@@ -6,9 +6,8 @@ export async function uploadFileForm(formData) {
 	var uploadURL = DEV_API_BASE + "/upload";
 	console.log(uploadURL);
 	try { 
-		const response = await axios.post(uploadURL, {
-			formData: formData,
-		});
+		console.log(formData);
+		const response = await axios.post(uploadURL, formData);
 		return response.data;
 
 	} catch (err) { 

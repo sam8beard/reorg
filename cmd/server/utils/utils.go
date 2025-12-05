@@ -60,6 +60,8 @@ func BuildRouterDev() *mux.Router {
 	r.HandleFunc("/health", api.HealthHandler).Methods("GET")
 	// Get user data
 	r.HandleFunc("/user", api.UserHandler).Methods("POST")
+	// Receive file uploads
+	r.HandleFunc("/upload", api.UploadHandler).Methods("POST")
 	/*
 		Add all handlers here...
 	*/
@@ -76,6 +78,7 @@ func BuildRouter() *mux.Router {
 
 	// Add health check
 	r.HandleFunc("/health", api.HealthHandler).Methods("GET")
+	// Add user account endpoint
 	r.HandleFunc("/user", api.UserHandler).Methods("POST")
 	/*
 		Add all handlers here...

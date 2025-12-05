@@ -32,7 +32,7 @@ export default function Organize(root, userData) {
 					<div>
 						<label  style='border: 0.05em white solid' id='drop-zone'>
 							Drop files here, or click to upload.
-							<input style="display: none;" id='file-input' type='file' multiple />
+							<input style="display: none;" id='dir-input' type='file' webkitdirectory directory multiple />
 						</label>
 					</div>
 
@@ -69,7 +69,7 @@ export default function Organize(root, userData) {
 	const uploadForm = root.querySelector("#upload-form");
 
 	// Make sure dropHandler handles multi-file uploads
-	dropZone.addEventListener("drop", (e) => dropHandler(e, preview));
+	dropZone.addEventListener("drop", (e) => dropHandler(e, root, preview));
 	// Prevent default browser behavior for dragover event 
 	dropZone.addEventListener("dragover", (e) => e.preventDefault());
 	// Handle default input 
