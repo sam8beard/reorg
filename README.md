@@ -9,5 +9,5 @@
 </h2>
 
 <h3 align="center">
-    A tool to organize cluttered files and directories, with or without the help of AI. Reorganize on your own terms.
+    A tool to organize cluttered files and directories, with or without the help of AI.
 </h3>

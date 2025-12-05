@@ -77,7 +77,10 @@ export async function onFileSubmit(e) {
 	} 
 
 	
+	// what should the response contain? 
+	// what page should we transition to or how should we modify the dom post upload? 
 	const response = await uploadFileForm(formData);
+	
 	console.log(response);
 }
 
