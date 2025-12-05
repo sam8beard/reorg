@@ -46,3 +46,6 @@ notes/
 # Executables
 reorg-dev
 reorg-prod
+
+# Development testing
+uploads
