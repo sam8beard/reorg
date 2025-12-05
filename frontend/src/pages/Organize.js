@@ -76,6 +76,6 @@ export default function Organize(root, userData) {
 	dropZone.addEventListener("change", (e) => fileInputHandler(e, preview));
 
 	// Handle form submission 
-	uploadForm.addEventListener("submit", (e) => onFileSubmit(e));
+	uploadForm.addEventListener("submit", (e) => onFileSubmit(e, root));
 
 } 

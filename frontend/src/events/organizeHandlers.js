@@ -52,7 +52,7 @@ function displayFiles(files, preview) {
 /*
  * Handles file upload form submission
  */
-export async function onFileSubmit(e) { 
+export async function onFileSubmit(e, root) { 
 	e.preventDefault();	
 	/* Send files to backend endpoint */
 	const form = e.target;
@@ -78,8 +78,17 @@ export async function onFileSubmit(e) {
 
 	
 	// what should the response contain? 
-	// what page should we transition to or how should we modify the dom post upload? 
 	const response = await uploadFileForm(formData);
+	const preview = root.querySelector("#file-preview");
+
+	// Clear preview and replace with message on submission
+	if (response.error) { 
+		preview.innerText = "Failed to upload files";	
+	} else {
+	// what page should we transition to or how should we modify the dom post upload? 
+		preview.innerText = "Files uploaded";
+	}
+	
 	
 	console.log(response);
 }
