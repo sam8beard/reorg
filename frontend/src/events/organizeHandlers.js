@@ -87,6 +87,7 @@ export async function onFileSubmit(e, root) {
 	} else {
 	// what page should we transition to or how should we modify the dom post upload? 
 		preview.innerText = "Files uploaded";
+		form.reset();
 	}
 	
 	

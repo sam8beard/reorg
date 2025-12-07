@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"io"
 	"log"
 	"net/http"
@@ -13,7 +14,10 @@ type UploadForm struct {
 }
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
-	uploadRoot := "./uploads"
+	// Generate new upload ID
+	uploadId := uuid.New()
+	uploadRoot := "./uploads/" + uploadId.String()
+
 	// Close request body
 	defer func() {
 		if closeErr := r.Body.Close(); closeErr != nil {
@@ -34,10 +38,6 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// use io.Copy ?
-	// what do we want to return to the frontend?
-	// the next logical step would be to flatten any directories and store/return a flattened list of all files
-
 	// Read files in chunks
 	for {
 		part, err := multiReader.NextPart()
@@ -47,9 +47,13 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		defer part.Close()
 		if part.FileName() != "" {
 			// File is found
-			// Store files on disk temporarily
+			// Store files on disk
 			filePath := filepath.Join(uploadRoot, part.FileName())
 			os.MkdirAll(filepath.Dir(filePath), 0755)
+
+			// this is the full path to the file
+			// need to find a way to reconstruct directory path on the backend...?
+			log.Printf("file path: %s", filePath)
 			// Create file on server to store file body
 			out, _ := os.Create(filePath)
 			io.Copy(out, part)
