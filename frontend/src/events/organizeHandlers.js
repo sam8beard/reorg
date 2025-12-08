@@ -14,21 +14,40 @@ export function attachOrganizePageHandler(button, root) {
 }
 
 /*
+ * Recursively read files from dropped directories
+ */
+function scanFiles(entry) { 
+	if (entry.isDirectory) { 
+		let dirReader = entry.createReader();
+		dirReader.readEntries((entries) => {
+			entries.forEach((entry) => { 
+				scanFiles(entry);
+			});
+		});
+	}
+}
+
+/*
  * Handle uploaded files via drop
  */
 export async function dropHandler(e, root, preview) { 
+	const items = e.dataTransfer.items;
 	e.preventDefault();
-	const files = [...e.dataTransfer.items]
-		.map((item) => item.getAsFile())
-		.filter((file) => file);
-	// Show preview
-	displayFiles(files, preview);
+	console.log(items);	
+	for (const item of items) { 
+		const entry = item.webkitGetAsEntry();
+		if (entry) { 
+			scanFiles(entry);
+		}
+	}
+	// show preview
+	displayFiles(items, preview);
 
-	// Store dropped files in file input for submission
+	// store dropped files in file input for submission
 	const input = root.querySelector("#dir-input");
-	const dt = new DataTransfer();
-	for (const file of files) dt.items.add(file);
-	input.files = dt.files;
+	//const dt = new DataTransfer();
+	//for (const file of items) dt.items.add(file);
+	input.files = items.files;
 }
 
 /*
@@ -42,9 +61,10 @@ export async function fileInputHandler(e, preview) {
  * Display preview for files uploaded
  */
 function displayFiles(files, preview) {
+	preview.innerText = "";
 	for (const file of files) { 
 		const li = document.createElement("li");
-		li.appendChild(document.createTextNode(file.webkitRelativePath || file.name));
+		li.appendChild(document.createTextNode(file.name));
 		preview.appendChild(li);
 	}
 } 
@@ -83,7 +103,8 @@ export async function onFileSubmit(e, root) {
 
 	// Clear preview and replace with message on submission
 	if (response.error) { 
-		preview.innerText = "Failed to upload files";	
+		preview.innerText = "Failed to upload files";
+		form.reset();
 	} else {
 	// what page should we transition to or how should we modify the dom post upload? 
 		preview.innerText = "Files uploaded";
