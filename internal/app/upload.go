@@ -64,4 +64,12 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			log.Printf("field: %s \t value: %s\n", part.FormName(), string(data))
 		}
 	}
+
+	// Return upload id in response
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(uploadId); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
