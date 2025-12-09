@@ -16,14 +16,17 @@ export function attachOrganizePageHandler(button, root) {
 /*
  * Recursively read files from dropped directories
  */
-function scanFiles(entry) { 
+async function scanFiles(entry, dt) { 
 	if (entry.isDirectory) { 
 		let dirReader = entry.createReader();
 		dirReader.readEntries((entries) => {
 			entries.forEach((entry) => { 
-				scanFiles(entry);
+				scanFiles(entry, dt);
 			});
 		});
+	} else {
+		entry.file((file) => dt.items.add(file));
+		//console.log(entry);
 	}
 }
 
@@ -33,21 +36,26 @@ function scanFiles(entry) {
 export async function dropHandler(e, root, preview) { 
 	const items = e.dataTransfer.items;
 	e.preventDefault();
-	console.log(items);	
+	const dt = new DataTransfer();
 	for (const item of items) { 
 		const entry = item.webkitGetAsEntry();
-		if (entry) { 
-			scanFiles(entry);
+		if (entry) {
+			scanFiles(entry, dt);
 		}
 	}
+	console.log(dt.files.length);
+	console.log(dt.items.length);
+	console.log(dt.files);
 	// show preview
-	displayFiles(items, preview);
-
+	// displayFiles(dt.files, preview);
+	for (const file of dt.files) { 
+		console.log(file.name);
+	} 
 	// store dropped files in file input for submission
 	const input = root.querySelector("#dir-input");
 	//const dt = new DataTransfer();
 	//for (const file of items) dt.items.add(file);
-	input.files = items.files;
+	input.files = dt.files;
 }
 
 /*
@@ -62,7 +70,7 @@ export async function fileInputHandler(e, preview) {
  */
 function displayFiles(files, preview) {
 	preview.innerText = "";
-	for (const file of files) { 
+	for (const file of files) {
 		const li = document.createElement("li");
 		li.appendChild(document.createTextNode(file.name));
 		preview.appendChild(li);
