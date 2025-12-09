@@ -14,19 +14,41 @@ export function attachOrganizePageHandler(button, root) {
 }
 
 /*
+ * Fetches the file object, wraps it in a promise
+ */
+function getFilesAsync(entry) { 
+	return new Promise((resolve, reject) => { 
+		entry.file(resolve, reject);
+	});
+}
+
+/*
+ * Reads the directory, wraps it in a promise
+ */
+function readEntriesAsync(dirReader) {
+	return new Promise((resolve, reject) => {
+		dirReader.readEntries((entries) => { 
+			resolve(entries), reject;
+		});
+	});
+}
+
+/*
  * Recursively read files from dropped directories
  */
 async function scanFiles(entry, dt) { 
 	if (entry.isDirectory) { 
 		let dirReader = entry.createReader();
-		dirReader.readEntries((entries) => {
-			entries.forEach((entry) => { 
-				scanFiles(entry, dt);
-			});
-		});
+		while (true) { 
+			const entries = await readEntriesAsync(dirReader);
+			if (entries.length === 0) break; 
+			for (const ent of entries) { 
+				await scanFiles(ent, dt);
+			} 
+		} 
 	} else {
-		entry.file((file) => dt.items.add(file));
-		//console.log(entry);
+		const file = await getFilesAsync(entry);
+		dt.items.add(file);
 	}
 }
 
@@ -40,7 +62,7 @@ export async function dropHandler(e, root, preview) {
 	for (const item of items) { 
 		const entry = item.webkitGetAsEntry();
 		if (entry) {
-			scanFiles(entry, dt);
+			await scanFiles(entry, dt);
 		}
 	}
 	console.log(dt.files.length);
@@ -56,6 +78,7 @@ export async function dropHandler(e, root, preview) {
 	//const dt = new DataTransfer();
 	//for (const file of items) dt.items.add(file);
 	input.files = dt.files;
+	displayFiles(dt.files, preview)
 }
 
 /*
