@@ -3,6 +3,8 @@ package main
 import (
 	"embed"
 	"fmt"
+	"github.com/sam8beard/reorg/internal/db/pgsql"
+	"github.com/sam8beard/reorg/internal/obj-store/minio"
 	// "github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"github.com/sam8beard/reorg/cmd/server/utils"
@@ -108,6 +110,9 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Panicf("could not load environment variables: %v", err)
 	}
+
+	db := pgsql.Init()
+	minio := minio.Init()
 
 	runDev()
 	//runProd()
