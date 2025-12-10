@@ -14,6 +14,7 @@ import (
 func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Generate new upload ID
 	uploadUUID := uuid.New()
+	//var userID int
 	uploadRoot := "./uploads/" + uploadUUID.String()
 
 	// Close request body
@@ -39,6 +40,9 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Read files in chunks
 	for {
 		part, err := multiReader.NextPart()
+		//if part.FormName() == "user" {
+		//	log.Printf("should be user ID: %v", part)
+		//}
 		if err == io.EOF {
 			break
 		}
@@ -61,14 +65,26 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 			data, _ := io.ReadAll(part)
 			log.Printf("field: %s \t value: %s\n", part.FormName(), string(data))
 		}
+
 	}
 
 	// Insert row in uploads table
-	result, dbErr := s.DB.Exec(
+	_, dbErr := s.DB.Exec(
 		context.Background(),
-		"INSERT INTO uploads (upload_uuid, user_id) VALUES ($1, $2)",
-		&userID, &uploadUUID,
+		"INSERT INTO uploads (upload_uuid, user_id) VALUES ($1, NULL)",
+		uploadUUID,
 	)
+	if dbErr != nil {
+		log.Printf("error from db exec call: %v", dbErr)
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not register upload with user"})
+		if encodeErr != nil {
+			log.Printf("failed to write response: %v", encodeErr)
+			return
+		}
+		return
+	}
 
 	// Return upload id in response
 	w.Header().Set("Content-Type", "application/json")
@@ -77,8 +93,4 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-}
-
-func insertUpload() {
-
 }

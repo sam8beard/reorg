@@ -127,7 +127,6 @@ export async function onFileSubmit(e, root) {
 		formData.append("files", file, path); 
 	} 
 
-	
 	// what should the response contain? 
 	const response = await uploadFileForm(formData);
 	const preview = root.querySelector("#file-preview");
