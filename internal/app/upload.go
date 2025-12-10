@@ -10,10 +10,7 @@ import (
 	"path/filepath"
 )
 
-type UploadForm struct {
-}
-
-func UploadHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Generate new upload ID
 	uploadId := uuid.New()
 	uploadRoot := "./uploads/" + uploadId.String()
@@ -64,7 +61,6 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			log.Printf("field: %s \t value: %s\n", part.FormName(), string(data))
 		}
 	}
-
 	// Return upload id in response
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

@@ -27,7 +27,7 @@ var dummyPassword2 = "angel"
 /*
 Get user data on login
 */
-func UserHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) UserHandler(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		if closeErr := r.Body.Close(); closeErr != nil {
 			log.Fatalf("could not close request body: %v", closeErr)
@@ -86,9 +86,9 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 				},
 			}
 			return validUser, nil
-		// Second dummy user
-		} else if u == dummyUsername2 && p == dummyPassword2 { 
-			
+			// Second dummy user
+		} else if u == dummyUsername2 && p == dummyPassword2 {
+
 			validUser := models.User{
 				UserID: models.Identity{
 					ID:       5678,
@@ -98,7 +98,7 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			return validUser, nil
 
-		} 
+		}
 		return models.User{}, fmt.Errorf("user does not exist")
 	}(username, password)
 
