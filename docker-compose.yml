@@ -5,7 +5,7 @@ services:
   # PostgreSQL metadata storage
   db:
     image: postgres:17
-    container_name: pgsql
+    container_name: db
     ports:
       - 5432:5432
     volumes: 
