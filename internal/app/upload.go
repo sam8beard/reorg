@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/google/uuid"
 	"io"
@@ -12,8 +13,8 @@ import (
 
 func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Generate new upload ID
-	uploadId := uuid.New()
-	uploadRoot := "./uploads/" + uploadId.String()
+	uploadUUID := uuid.New()
+	uploadRoot := "./uploads/" + uploadUUID.String()
 
 	// Close request body
 	defer func() {
@@ -61,11 +62,23 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 			log.Printf("field: %s \t value: %s\n", part.FormName(), string(data))
 		}
 	}
+
+	// Insert row in uploads table
+	result, dbErr := s.DB.Exec(
+		context.Background(),
+		"INSERT INTO uploads (upload_uuid, user_id) VALUES ($1, $2)",
+		&userID, &uploadUUID,
+	)
+
 	// Return upload id in response
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(uploadId); err != nil {
+	if err := json.NewEncoder(w).Encode(uploadUUID); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func insertUpload() {
+
 }

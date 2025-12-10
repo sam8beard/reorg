@@ -3,7 +3,7 @@ const DEV_API_BASE = "http://localhost:5173/api";
 
 /* Post file data to backend */
 export async function uploadFileForm(formData) { 
-	var uploadURL = DEV_API_BASE + "/upload";
+	var uploadURL = DEV_API_BASE + "/upload" ;
 	try { 
 		console.log(formData);
 		const response = await axios.post(uploadURL, formData);
