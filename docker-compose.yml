@@ -18,7 +18,7 @@ services:
   # MinIO object storage
   obj-store:
     image: quay.io/minio/minio:latest
-    container_name: minio
+    container_name: obj-store
     ports:
       - 9000:9000
       - 9001:9001
