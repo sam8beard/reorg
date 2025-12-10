@@ -4,12 +4,13 @@ services:
 
   # PostgreSQL metadata storage
   db:
-    image: postgres:latest
+    image: postgres:17
     container_name: pgsql
     ports:
       - 5432:5432
     volumes: 
-      - ./internal/db/pg-data:/var/lib/posgresql/data
+      - ./internal/db/pg-data:/var/lib/postgresql/data
+      - ./internal/db/db-init:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
