@@ -5,10 +5,11 @@ services:
   # PostgreSQL metadata storage
   db:
     image: postgres:latest
+    container_name: pgsql
     ports:
       - 5432:5432
     volumes: 
-      - ./internal/db/pgdata:/var/lib/posgresql/data
+      - ./internal/db/pg-data:/var/lib/posgresql/data
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -16,7 +17,7 @@ services:
 
   # MinIO object storage
   obj-store:
-    image: minio/minio
+    image: quay.io/minio/minio:latest
     container_name: minio
     ports:
       - 9000:9000
@@ -28,3 +29,16 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server /data --console-address ":9001"
 
+  # PGAdmin for dev
+  pgadmin: 
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - 1234:80
+    volumes:
+      - ./internal/pgadmin/pgadmin-data:/var/lib/pgadmin
+    depends_on: 
+      - db

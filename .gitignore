@@ -49,3 +49,8 @@ reorg-prod
 
 # Development testing
 uploads
+
+# Mounts
+internal/obj-store/minio-data/
+internal/pgadmin/pgadmin-data/
+internal/db/pg-data/
