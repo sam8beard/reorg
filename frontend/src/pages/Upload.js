@@ -2,7 +2,7 @@
  * Upload page
  */
 import { store } from '../state.js';
-import { dropHandler, fileInputHandler, onFileSubmit } from '../events';
+import { dropHandler, fileInputHandler, onFileSubmit, onOrganizePageSubmit } from '../events';
 
 export default function Upload(root, userData) { 
 	console.log(userData)
@@ -37,9 +37,13 @@ export default function Upload(root, userData) {
 					</div>
 
 					<div>
-						<button type='submit'>Upload</button>
+						<button id='upload-btn' type='submit'>Upload</button>
 					</div>
 				</form> 
+
+				<div>
+					<button id='organize-page-btn' type='click' disabled='true' style='display: none;'>Organize</button>
+				</div>
 				<!-- 
 				Here is where we will display the preview for all files 
 				uploaded so far
@@ -67,7 +71,7 @@ export default function Upload(root, userData) {
 	const dropZone = root.querySelector("#drop-zone");
 	const preview = root.querySelector("#file-preview");
 	const uploadForm = root.querySelector("#upload-form");
-
+	
 	// Make sure dropHandler handles multi-file uploads
 	dropZone.addEventListener("drop", (e) => dropHandler(e, root, preview));
 	// Prevent default browser behavior for dragover event 
@@ -76,5 +80,8 @@ export default function Upload(root, userData) {
 	dropZone.addEventListener("change", (e) => fileInputHandler(e, preview));
 	// Handle form submission 
 	uploadForm.addEventListener("submit", (e) => onFileSubmit(e, root));
-
+	
+	// Handle transition to Organize page upon successful upload
+	const organizeBtn = root.querySelector('#organize-page-btn')
+	organizeBtn.addEventListener("click", (e) => onOrganizePageSubmit(e, root));
 } 

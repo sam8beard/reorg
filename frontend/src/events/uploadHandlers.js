@@ -130,7 +130,8 @@ export async function onFileSubmit(e, root) {
 	// what should the response contain? 
 	const response = await uploadFileForm(formData);
 	const preview = root.querySelector("#file-preview");
-
+	const uploadBtn = root.querySelector("#upload-btn");
+	const organizeBtn = root.querySelector("#organize-page-btn");
 	// Clear preview and replace with message on submission
 	if (response.error) { 
 		preview.innerText = "Failed to upload files";
@@ -138,6 +139,9 @@ export async function onFileSubmit(e, root) {
 	} else {
 	// what page should we transition to or how should we modify the dom post upload? 
 		preview.innerText = "Files uploaded";
+		uploadBtn.innerText = "Upload more files";
+		organizeBtn.style.display = 'block';
+		organizeBtn.disabled = false;
 		form.reset();
 	}
 	
