@@ -13,8 +13,9 @@ import (
 )
 
 type Server struct {
-	DB    *pgxpool.Pool
-	Minio *minio.Client
+	DB          *pgxpool.Pool
+	Minio       *minio.Client
+	MinioBucket string
 }
 
 /*
@@ -28,9 +29,15 @@ type SpaHandler struct {
 }
 
 func NewServer(db *pgxpool.Pool, minio *minio.Client) *Server {
+
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("could not load env vars: %v", err)
+	}
+
 	return &Server{
-		DB:    db,
-		Minio: minio,
+		DB:          db,
+		Minio:       minio,
+		MinioBucket: os.Getenv("MINIO_BUCKET_NAME"),
 	}
 }
 

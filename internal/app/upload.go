@@ -3,7 +3,9 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/google/uuid"
+	"github.com/minio/minio-go/v7"
 	"io"
 	"log"
 	"net/http"
@@ -59,6 +61,22 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 			// Create file on server to store file body
 			out, _ := os.Create(filePath)
 			io.Copy(out, part)
+			// Insert each file into minio bucket under upload id
+			var opts minio.PutObjectOptions
+			objKey := fmt.Sprintf("%s/%s", uploadUUID, part.FileName())
+			_, minioErr := s.Minio.PutObject(context.Background(), s.MinioBucket, objKey, part, 0, opts)
+			if minioErr != nil {
+				log.Printf("error from minio put object call: %v", minioErr)
+				w.Header().Set("Content-Type", "application/json")
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not register upload in object storage"})
+				if encodeErr != nil {
+					log.Printf("failed to write response: %v", encodeErr)
+					return
+				}
+				return
+			}
+
 			out.Close()
 		} else {
 			// Text field found
