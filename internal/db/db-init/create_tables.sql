@@ -19,7 +19,6 @@ CREATE TABLE files (
 	id SERIAL PRIMARY KEY,
 	upload_id INTEGER REFERENCES uploads(id),
 	s3_key TEXT NOT NULL,
-	original_path TEXT NOT NULL,
 	size INTEGER NOT NULL,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
