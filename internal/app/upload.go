@@ -9,15 +9,11 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 )
 
 func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Generate new upload ID
 	uploadUUID := uuid.New()
-	//var userID int
-	uploadRoot := "./uploads/" + uploadUUID.String()
 
 	// Close request body
 	defer func() {
@@ -49,26 +45,16 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		defer part.Close()
-		if part.FileName() != "" {
+		if part.FileName() != "" && part.FileName() != ".DS_Store" {
 			// File is found
-			// Store files on disk
-			filePath := filepath.Join(uploadRoot, part.FileName())
-			os.MkdirAll(filepath.Dir(filePath), 0755)
-
-			// this is the full path to the file
-			// need to find a way to reconstruct directory path on the backend...?
-			log.Printf("file path: %s", filePath)
-			// Create file on server to store file body
-			out, _ := os.Create(filePath)
-			io.Copy(out, part)
 			// Insert each file into minio bucket under upload id
 			var opts minio.PutObjectOptions
 			objKey := fmt.Sprintf("%s/%s", uploadUUID, part.FileName())
-			_, minioErr := s.Minio.PutObject(context.Background(), s.MinioBucket, objKey, part, 0, opts)
+			_, minioErr := s.Minio.PutObject(context.Background(), s.MinioBucket, objKey, part, -1, opts)
 			if minioErr != nil {
 				log.Printf("error from minio put object call: %v", minioErr)
 				w.Header().Set("Content-Type", "application/json")
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				http.Error(w, minioErr.Error(), http.StatusInternalServerError)
 				encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not register upload in object storage"})
 				if encodeErr != nil {
 					log.Printf("failed to write response: %v", encodeErr)
@@ -77,7 +63,6 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			out.Close()
 		} else {
 			// Text field found
 			data, _ := io.ReadAll(part)
