@@ -1,16 +1,16 @@
 /*
- * Handlers and utils for organize related actions
+ * Handlers and utils for upload related actions
  */
 import { uploadFileForm } from '../api';
-import { showOrganize } from '../navigation.js';
+import { showUpload } from '../navigation.js';
 import { store } from '../state.js';
 /*
  * Adds event for guest button click on landing page.
  *
- * Shows organize page
+ * Shows upload page
  */
-export function attachOrganizePageHandler(button, root) {
-	button.addEventListener('click', () => showOrganize());
+export function attachUploadPageHandler(button, root) {
+	button.addEventListener('click', () => showUpload());
 }
 
 /*

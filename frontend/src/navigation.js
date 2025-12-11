@@ -1,6 +1,6 @@
 /* Wrapper functions for showing a page based on state and user */
 import { store, subscribe } from './state.js';
-import { Landing, Signup, Login, Home, Organize } from './pages';
+import { Landing, Signup, Login, Home, Upload } from './pages';
 
 export function renderPage() { 
 	const root = document.getElementById('root');
@@ -17,8 +17,8 @@ export function renderPage() {
 		case 'home': 
 			Home(root, store.user);
 			break;
-		case 'organize':
-			Organize(root, store.user);
+		case 'upload':
+			Upload(root, store.user);
 		/*
 		 * Additional pages go here
 		 *
@@ -66,11 +66,11 @@ export function showHome(userData) {
 	 */
 }
 
-/* Show organize page */
-export function showOrganize() { 
+/* Show upload page */
+export function showUpload() { 
 	// notify server on page visit
-	logPageVisit('organize');
-	store.currentPage = 'organize';
+	logPageVisit('upload');
+	store.currentPage = 'upload';
 }
 
 /* Util for logging page visit */

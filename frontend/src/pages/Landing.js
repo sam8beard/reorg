@@ -1,6 +1,6 @@
 import '../../src/style.css';
 import reorgLogo from '../assets/reorg-logo.png';
-import { attachLoginPageHandler, attachSignupPageHandler, attachOrganizePageHandler } from '../events';
+import { attachLoginPageHandler, attachSignupPageHandler, attachUploadPageHandler } from '../events';
 
 /*
  * Render landing page
@@ -32,5 +32,5 @@ export default function Landing(root) {
 	const guestBtn = root.querySelector('#guest-btn');
 	attachLoginPageHandler(loginBtn, root);
 	attachSignupPageHandler(signupBtn, root);
-	attachOrganizePageHandler(guestBtn, root);
+	attachUploadPageHandler(guestBtn, root);
 }

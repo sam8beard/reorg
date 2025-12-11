@@ -2,7 +2,7 @@
  * The Home Page
  */
 import '../styles/home.css';
-import { attachOrganizePageHandler } from '../events';
+import { attachUploadPageHandler } from '../events';
 export default function Home(root, userData) { 
 	console.log(userData);
 	const userID = userData.userID;
@@ -16,7 +16,7 @@ export default function Home(root, userData) {
 				</h1>
 			</div>
 			<div id='home-options-container'>
-				<button id='organize-files-btn'>Organize files</button>
+				<button id='upload-files-btn'>Upload files</button>
 			</div>
 			<div id='user-info'>
 				<div id='dashboard-header-container'>
@@ -32,7 +32,7 @@ export default function Home(root, userData) {
 	`;
 
 	// Attach event handlers
-	const organizeBtn = root.querySelector('#organize-files-btn');
-	attachOrganizePageHandler(organizeBtn, root);
+	const uploadBtn = root.querySelector('#upload-files-btn');
+	attachUploadPageHandler(uploadBtn, root);
 }
 
