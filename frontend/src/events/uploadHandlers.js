@@ -127,8 +127,10 @@ export async function onFileSubmit(e, root) {
 		formData.append("files", file, path); 
 	} 
 
-	// what should the response contain? 
+	// upload files
 	const response = await uploadFileForm(formData);
+
+	// alter frontend state
 	const preview = root.querySelector("#file-preview");
 	const uploadBtn = root.querySelector("#upload-btn");
 	const organizeBtn = root.querySelector("#organize-page-btn");
@@ -143,8 +145,14 @@ export async function onFileSubmit(e, root) {
 		uploadBtn.disabled= true;
 		organizeBtn.style.display = 'block';
 		organizeBtn.disabled = false;
+
+		// Use upload ID returned from backend response
+		store.upload.uploadID = response
+	
 		form.reset();
+
 	}
+
 	
 	
 	console.log(response);

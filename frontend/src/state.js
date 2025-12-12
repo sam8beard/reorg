@@ -7,6 +7,13 @@ const initialState = {
 	user: null,
 	isLoggedIn: false,
 	currentPage: 'landing',
+	upload: {
+		uploadID: null,
+		sessionID: null,
+		files: []
+	},
+	rules: null,
+	resultZipURL: null,
 	loginError: null,
 };
 

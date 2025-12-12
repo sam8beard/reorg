@@ -14,9 +14,6 @@ type LoginForm struct {
 	Password string `json:"password"`
 }
 
-//type UserData struct {
-//}
-
 // dummy data for testing
 var dummyUsername = "username"
 var dummyPassword = "password"

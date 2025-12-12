@@ -14,6 +14,11 @@ export default function Organize(root, userData) {
 					Organize with Rules
 				</button>
 			</div>
+			<div id='organize-file-preview'>
+				<!-- Fetch all files with the correct upload id and display here -->	
+			</div>
 		</div>
 	`;
-} 
+
+	
+}

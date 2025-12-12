@@ -93,7 +93,7 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 			if dbErr != nil {
 				log.Printf("error from db exec call: %v", dbErr)
 				w.Header().Set("Content-Type", "application/json")
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				http.Error(w, dbErr.Error(), http.StatusInternalServerError)
 				encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not register upload with user"})
 				if encodeErr != nil {
 					log.Printf("failed to write response: %v", encodeErr)
@@ -108,10 +108,29 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
+	// Get upload id for reference in frontend state
+	var uploadId int
+	dbErr = s.DB.QueryRow(
+		context.Background(),
+		"SELECT id FROM uploads WHERE upload_uuid = $1",
+		uploadUUID,
+	).Scan(&uploadId)
+	if dbErr != nil {
+		log.Printf("error from db query row call: %v", dbErr)
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, dbErr.Error(), http.StatusInternalServerError)
+		encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not register upload with user"})
+		if encodeErr != nil {
+			log.Printf("failed to write response: %v", encodeErr)
+			return
+		}
+		return
+	}
+
 	// Return upload id in response
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(uploadUUID); err != nil {
+	if err := json.NewEncoder(w).Encode(uploadId); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
