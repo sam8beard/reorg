@@ -1,6 +1,6 @@
 /* Wrapper functions for showing a page based on state and user */
 import { store, subscribe } from './state.js';
-import { Landing, Signup, Login, Home, Upload, Organize } from './pages';
+import { Landing, Signup, Login, Home, Upload, Organize, RuleCreation } from './pages';
 
 export function renderPage() { 
 	const root = document.getElementById('root');
@@ -23,6 +23,9 @@ export function renderPage() {
 		case 'organize':
 			Organize(root, store.user);
 			break;
+		case 'ruleCreation':
+			RuleCreation(root, store.user);
+			break
 
 		/*
 		 * Additional pages go here
@@ -85,6 +88,12 @@ export function showOrganize() {
 	store.currentPage = 'organize';
 }
 
+/* Show rule creation page */
+export function showRuleCreation() { 
+	// notify server on page visit
+	logPageVisit('ruleCreation');
+	store.currentPage = 'ruleCreation';
+}
 
 /* Util for logging page visit */
 function logPageVisit(pageName) { 
