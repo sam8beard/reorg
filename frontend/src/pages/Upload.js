@@ -2,7 +2,7 @@
  * Upload page
  */
 import { store } from '../state.js';
-import { dropHandler, fileInputHandler, onFileSubmit, onOrganizePageSubmit } from '../events';
+import { dropHandler, fileInputHandler, onFileSubmit, onOrganizePageClick } from '../events';
 
 export default function Upload(root, userData) { 
 	console.log(userData)
@@ -83,5 +83,5 @@ export default function Upload(root, userData) {
 	
 	// Handle transition to Organize page upon successful upload
 	const organizeBtn = root.querySelector('#organize-page-btn')
-	organizeBtn.addEventListener("click", (e) => onOrganizePageSubmit(e, root));
+	organizeBtn.addEventListener("click", (e) => onOrganizePageClick(e, root));
 }
