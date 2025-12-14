@@ -32,6 +32,14 @@ CREATE TABLE rulesets (
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE targets ( 
+	id SERIAL PRIMARY KEY,
+	target_uuid UUID NOT NULL UNIQUE,
+	user_id INTEGER REFERENCES users(id),
+	name TEXT NOT NULL, 
+	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE TABLE jobs (
 	id SERIAL PRIMARY KEY,
 	job_uuid UUID NOT NULL DEFAULT gen_random_uuid(),
