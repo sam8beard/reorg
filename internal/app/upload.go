@@ -93,7 +93,7 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 			if dbErr != nil {
 				log.Printf("error from db exec call: %v", dbErr)
 				w.Header().Set("Content-Type", "application/json")
-				http.Error(w, dbErr.Error(), http.StatusInternalServerError)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
 				encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not register upload with user"})
 				if encodeErr != nil {
 					log.Printf("failed to write response: %v", encodeErr)

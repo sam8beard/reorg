@@ -21,8 +21,6 @@ export default function Landing(root) {
 					<button id='guest-btn'>Use without an account</button>
 				</div>
 			<div>
-			
-			
 		</div> 
 	`;
 

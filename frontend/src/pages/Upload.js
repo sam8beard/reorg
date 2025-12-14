@@ -31,7 +31,7 @@ export default function Upload(root, userData) {
 				<form id='upload-form' name='upload-form'>
 					<div>
 						<label  style='border: 0.05em white solid' id='drop-zone'>
-							Drop files here, or click to upload.
+							Drop files here, or click to upload
 							<input style="display: none;" id='dir-input' type='file' webkitdirectory directory multiple />
 						</label>
 					</div>

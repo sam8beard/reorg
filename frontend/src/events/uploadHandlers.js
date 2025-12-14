@@ -147,8 +147,8 @@ export async function onFileSubmit(e, root) {
 		organizeBtn.disabled = false;
 
 		// Use upload ID returned from backend response
-		store.upload.uploadID = response
-	
+		store.upload.uploadID = response;
+		console.log("firing in upload handler, should be id and not uuid: " + store.upload.uploadID);
 		form.reset();
 
 	}

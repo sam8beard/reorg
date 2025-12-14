@@ -21,7 +21,7 @@ func (s *Server) BuildRouterDev() *mux.Router {
 	// Receive file uploads
 	r.HandleFunc("/upload", s.UploadHandler).Methods("POST")
 	// Fetch files
-	r.HandleFunc("/files", s.UploadHandler).Methods("POST")
+	r.HandleFunc("/files", s.FileHandler).Methods("POST")
 	/*
 		Add all handlers here...
 	*/

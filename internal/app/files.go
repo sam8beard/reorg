@@ -1,10 +1,14 @@
 package app
 
 import (
+	"context"
 	"encoding/json"
+	//"github.com/minio/minio-go/v7"
 	"io"
 	"log"
 	"net/http"
+	"path/filepath"
+	"strconv"
 )
 
 /* Get files that match a upload id in request */
@@ -29,6 +33,90 @@ func (s *Server) FileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Do I need to unmarshal the body? Or since its a single value can I use it directly?
-	log.Printf("%v", body)
+	// Convert body to int to access upload ID
+	uploadId, err := strconv.Atoi(string(body))
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not read request body"})
+		if encodeErr != nil {
+			log.Printf("failed to write response: %v", encodeErr)
+			return
+		}
+		return
+	}
+	log.Printf("Should be int: %d", uploadId)
+
+	// Use upload ID to query all s3_keys of matching rows in files table
+	fileRows, dbErr := s.DB.Query(
+		context.Background(),
+		"SELECT s3_key FROM files WHERE upload_id = $1",
+		uploadId,
+	)
+	if dbErr != nil {
+		log.Printf("error from db query call: %v", dbErr)
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, dbErr.Error(), http.StatusInternalServerError)
+		encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not retrieve files"})
+		if encodeErr != nil {
+			log.Printf("failed to write response: %v", encodeErr)
+			return
+		}
+		return
+	}
+
+	// Scan all rows and store s3 keys
+	s3Keys := make([]string, 0)
+	fileNames := make([]string, 0)
+	for fileRows.Next() {
+		log.Println("Scanning row...")
+		var key string
+		if dbErr := fileRows.Scan(&key); dbErr != nil {
+			log.Printf("error scanning value from row: %v", dbErr)
+			w.Header().Set("Content-Type", "application/json")
+			http.Error(w, dbErr.Error(), http.StatusInternalServerError)
+			encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not retrieve files"})
+			if encodeErr != nil {
+				log.Printf("failed to write response: %v", encodeErr)
+				return
+			}
+			return
+		}
+		log.Printf("file name: %s", filepath.Base(key))
+		fileNames = append(fileNames, filepath.Base(key))
+		_ = append(s3Keys, key)
+	}
+	log.Printf("file names: %v", fileNames)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(fileNames); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	/* For now, not going to return all file bodies, just names
+
+
+	// Fetch all files from bucket
+	for _, key := range s3Keys {
+		var opts minio.GetObjectOptions
+		file, err := s.Minio.GetObject(
+			context.Background(),
+			s.MinioBucket,
+			key,
+			opts,
+		)
+		if err != nil {
+			log.Printf("error getting object from bucket: %v", dbErr)
+			w.Header().Set("Content-Type", "application/json")
+			http.Error(w, dbErr.Error(), http.StatusInternalServerError)
+			encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not retrieve files"})
+			if encodeErr != nil {
+				log.Printf("failed to write response: %v", encodeErr)
+				return
+			}
+			return
+		}
+	}
+	*/
+
 }
