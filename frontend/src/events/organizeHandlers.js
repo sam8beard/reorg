@@ -1,7 +1,7 @@
 /*
  * Handlers and utils for organize page related actions
  */
-import { showOrganize } from '../navigation.js';
+import { showOrganize, showRuleCreation } from '../navigation.js';
 import { fetchFiles } from '../api';
 import { store } from '../state.js';
 
@@ -67,9 +67,13 @@ async function onCreateDirClick(root) {
 async function onCreateDirFormSubmit(event, createDirContainer) { 
 	event.preventDefault();
 	const form = event.target;
-	
-	const dirName = form.elements.dir.value;
+
+	// generate id and name for new target
+	const targetName = form.elements.dir.value;
+	const targetId = crypto.randomUUID();
+	store.targets.push({targetId, targetName});
 	// Show rule creation page
-	console.log(dirName);
+	showRuleCreation();
+	console.log(targetName);
 }
 

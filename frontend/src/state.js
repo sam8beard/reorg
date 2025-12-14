@@ -12,7 +12,8 @@ const initialState = {
 		sessionID: null,
 		files: []
 	},
-	rules: null,
+	targets: [],
+	rules: [],
 	resultZipURL: null,
 	loginError: null,
 };
