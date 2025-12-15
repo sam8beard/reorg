@@ -11,7 +11,7 @@ export default function Upload(root, userData) {
 	const username = (user) ? store.user.userID.username : "Guest";
 	root.innerHTML = `
 		<div id='upload-root'>
-			<h1 id='upload-banner'>
+			<h1 style='margin: 4em;' id='upload-banner'>
 				${username}
 			</h1>
 
@@ -30,20 +30,19 @@ export default function Upload(root, userData) {
 				-->
 				<form id='upload-form' name='upload-form'>
 					<div>
-						<label  style='border: 0.05em white solid' id='drop-zone'>
+						<label  style='border-radius: 0.5em; padding: 5em; margin: 1em; border: 0.05em white dashed' id='drop-zone'>
 							Drop files here, or click to upload
 							<input style="display: none;" id='dir-input' type='file' webkitdirectory directory multiple />
 						</label>
 					</div>
 
 					<div>
-						<button id='upload-btn' type='submit'>Upload</button>
+						<button style='margin-top: 6em;' id='upload-btn' type='submit'>Upload</button>
+						<button style='display:none; margin-top: 6em;' id='organize-page-btn' type='click' disabled='true'>Organize</button>
 					</div>
+
 				</form> 
 
-				<div>
-					<button id='organize-page-btn' type='click' disabled='true' style='display: none;'>Organize</button>
-				</div>
 				<!-- 
 				Here is where we will display the preview for all files 
 				uploaded so far

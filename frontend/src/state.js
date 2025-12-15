@@ -14,6 +14,7 @@ const initialState = {
 	},
 	targets: [],
 	rules: [],
+	activeTarget: null,
 	resultZipURL: null,
 	loginError: null,
 };

@@ -1,34 +1,50 @@
 import { store } from '../state.js';
 export default function RuleCreation(root, user) {
-	// Get most recently pushed target onto target list
-	const currTarget = store.targets[store.targets.length - 1]
+	// Get active target
+	const currTarget = store.activeTarget
 	root.innerHTML = `
 		<div id='rule-creation-root'>
 			<!-- Is this the optimal way to get the most recently added target dir??? -->
-			<h1> Add rules for ${currTarget.targetName} </h1>
+			<h4> Add rules for <strong>${currTarget.targetName}</strong>: </h4>
 			<div id='rule-option-container'>
 				<!-- Implement some external module for the multiselect dropdown -->
 				<form id='rule-option-form' method='post'>
 					<div>
-						<label for='fileTypes'>File Type(s): </label>
-						<select name='fileTypes' id='fileTypes' multiple data-multi-select>
-							<option value="pdf">PDF (.pdf)</option>
-							<option value="image">Images (.jpg, .png)</option>
-							<option value="video">Videos (.mp3, .mov)</option>
-							<option value="text">Text files (.txt, .md)</option>
-						</select>
+						<label for='fileTypes'><strong>Move files of type:</strong> </label><br>
+						<input type='checkbox' id='pdf-choice' name='pdf' value='pdf'>
+						<label for='pdf'>PDF (.pdf)</label><br>
+						<input type='checkbox' id='image-choice' name='image' value='image'>
+						<label for='image'>Images (.jpg, .png)</label><br>
+						<input type='checkbox' id='text-choice' name='text' value='text'>
+						<label for='text'>Text files (.txt, .md)</label><br>
+						<input type='checkbox' id='video-choice' name='video' value='video'>
+						<label for='video'>Videos (.mp3, .mov)</label><br>
+						<input type='checkbox' id='document-choice' name='document' value='document'>
+						<label for='document'>Documents (.docx, .doc)</label><br>
 					</div>
 					<div>
-						<label for='nameContains'>Name Contains: </label>
+						<label for='nameContains'><strong>File name contains:</strong> </label>
 						<input type='text' name='nameContains' id='nameContains'>
 					</div>
 					<div> <!-- Need to include greater than/less than options for file size -->
-						<label for='size'>Size (specify MB or GB): </label>
-						<input type='text' name='size' id='file-size'>
+						<label><strong>File size:</strong>  </label>
+						<select name='comparator' id='comparator'>
+							<option value='lt'>less than</option>
+							<option value='gt'>greater than</option>
+						</select>
+						<input type='number' name='size' id='file-size'>
+						<select name='unit' id='unit'>
+							<option value='mb'>MB</option>
+							<option value='gb'>GB</option>
+						</select>
 					</div>
 					<div <!-- Need to include before/after options for data created -->
-						<label for='date'>Date Created: </label>
-						<input type='date' id='date-created'>
+						<label for='dateBefore'>Created <strong>before</strong>: </label>
+						<input name='dateBefore' type='date' id='date-before'>
+					</div>
+					<div>
+						<label for='dateAfter'>Created <strong>after</strong>: </label>
+						<input name='dateAfter' type='date' id='date-after'>
 					</div>
 				</form>
 			</div>

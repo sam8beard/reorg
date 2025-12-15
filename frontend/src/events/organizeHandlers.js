@@ -56,8 +56,13 @@ async function onCreateDirClick(root) {
 			<label for='dir-name'>
 				Folder Name: 
 			</label>
-			<input type='text' id='dir-name' name='dir' placeholder='Folder Name'>
-			<button type='submit'>Create Folder</button>
+			<input type='text' id='dir-name' name='dir' required placeholder='Folder Name'>
+			<div>
+				<button style='margin-top: 0.5em;' type='submit'>Create Folder</button>
+			</div>
+			<div>
+				<p id='create-dir-error'></p>
+			</div>
 		</form>
 	`;
 	const createDirForm = createDirContainer.querySelector('#create-dir-form');
@@ -69,12 +74,21 @@ async function onCreateDirFormSubmit(event, createDirContainer) {
 	const form = event.target;
 
 	// generate id and name for new target
-	const targetName = form.elements.dir.value;
+	const targetName = form.elements.dir.value.trim();
+	if (targetName === "") { 
+		const errMsg = createDirContainer.querySelector('#create-dir-error');
+		errMsg.innerText = "Must supply folder name";
+		return;
+	}
+	createDirContainer.querySelector('#create-dir-error').innerText = "";	
 	const targetUUID = crypto.randomUUID();
 
 	// Do we want to store the ID along with the UUID??
 	store.targets.push({targetUUID, targetName});
-	const response = await postTarget(targetUUID, targetName);
+	const target = { targetUUID: targetUUID, targetName: targetName}
+	store.activeTarget = target
+	// I don't think we want to post the target here yet...
+	//const response = await postTarget(targetUUID, targetName);
 	showRuleCreation()
 }
 
