@@ -27,7 +27,7 @@ export default function RuleCreation(root, user) {
 						<input type='text' name='size' id='file-size'>
 					</div>
 					<div <!-- Need to include before/after options for data created -->
-						<label for='date'>Data Created: </label>
+						<label for='date'>Date Created: </label>
 						<input type='date' id='date-created'>
 					</div>
 				</form>
