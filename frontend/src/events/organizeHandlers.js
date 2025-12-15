@@ -2,7 +2,7 @@
  * Handlers and utils for organize page related actions
  */
 import { showOrganize, showRuleCreation } from '../navigation.js';
-import { fetchFiles } from '../api';
+import { fetchFiles, postTarget } from '../api';
 import { store } from '../state.js';
 
 export async function onOrganizePageClick(e, root) {
@@ -70,10 +70,11 @@ async function onCreateDirFormSubmit(event, createDirContainer) {
 
 	// generate id and name for new target
 	const targetName = form.elements.dir.value;
-	const targetId = crypto.randomUUID();
-	store.targets.push({targetId, targetName});
-	// Show rule creation page
-	showRuleCreation();
-	console.log(targetName);
+	const targetUUID = crypto.randomUUID();
+
+	// Do we want to store the ID along with the UUID??
+	store.targets.push({targetUUID, targetName});
+	const response = await postTarget(targetUUID, targetName);
+	showRuleCreation()
 }
 

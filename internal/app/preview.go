@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (s *Server) Preview(w http.ResponseWriter, r *http.Request) {
+func (s *Server) PreviewHandler(w http.ResponseWriter, r *http.Request) {
 	// Close request body
 	defer func() {
 		if closeErr := r.Body.Close(); closeErr != nil {

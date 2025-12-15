@@ -3,7 +3,7 @@ const DEV_API_BASE = "http://localhost:5173/api";
 
 /* Post file data to backend */
 export async function uploadFileForm(formData) { 
-	const uploadURL = DEV_API_BASE + "/upload" ;
+	const uploadURL = DEV_API_BASE + "/upload";
 	try { 
 		console.log(formData);
 		const response = await axios.post(uploadURL, formData);
@@ -11,7 +11,7 @@ export async function uploadFileForm(formData) {
 
 	} catch (err) { 
 		if (err.response) { 
-			console.log(err);
+			console.log(err); 
 			return { error: err.response.data.error || 'Unknown error' };
 		} else { 
 			console.log(err);
