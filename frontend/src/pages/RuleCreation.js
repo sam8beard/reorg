@@ -20,7 +20,15 @@ export default function RuleCreation(root, user) {
 					</div>
 					<div>
 						<label for='nameContains'>Name Contains: </label>
-						<input name='nameContains' id='nameContains'>
+						<input type='text' name='nameContains' id='nameContains'>
+					</div>
+					<div> <!-- Need to include greater than/less than options for file size -->
+						<label for='size'>Size (specify MB or GB): </label>
+						<input type='text' name='size' id='file-size'>
+					</div>
+					<div <!-- Need to include before/after options for data created -->
+						<label for='date'>Data Created: </label>
+						<input type='date' id='date-created'>
 					</div>
 				</form>
 			</div>
