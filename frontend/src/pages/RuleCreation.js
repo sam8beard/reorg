@@ -1,4 +1,5 @@
 import { store } from '../state.js';
+import { onRuleSubmit } from '../events';
 export default function RuleCreation(root, user) {
 	// Get active target
 	const currTarget = store.activeTarget
@@ -38,7 +39,7 @@ export default function RuleCreation(root, user) {
 							<option value='gb'>GB</option>
 						</select>
 					</div>
-					<div <!-- Need to include before/after options for data created -->
+					<div> <!-- Need to include before/after options for data created -->
 						<label for='dateBefore'>Created <strong>before</strong>: </label>
 						<input name='dateBefore' type='date' id='date-before'>
 					</div>
@@ -46,8 +47,14 @@ export default function RuleCreation(root, user) {
 						<label for='dateAfter'>Created <strong>after</strong>: </label>
 						<input name='dateAfter' type='date' id='date-after'>
 					</div>
+					<div>
+						<button id='rule-btn' type='submit'>Add rules</button>
+					</div>
 				</form>
 			</div>
 		</div>
 	`;
+	const ruleForm = root.querySelector("#rule-option-form");
+	ruleForm.addEventListener("submit", (e) => onRuleSubmit(e, root));
+
 }
