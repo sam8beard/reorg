@@ -11,16 +11,16 @@ export default function RuleCreation(root, user) {
 				<!-- Implement some external module for the multiselect dropdown -->
 				<form id='rule-option-form' method='post'>
 					<div>
-						<label for='fileTypes'><strong>Move files of type:</strong> </label><br>
-						<input type='checkbox' id='pdf-choice' name='pdf' value='pdf'>
+						<label for='fileType'><strong>Move files of type:</strong> </label><br>
+						<input type='checkbox' id='pdf-choice' name='fileType' value='pdf'>
 						<label for='pdf'>PDF (.pdf)</label><br>
-						<input type='checkbox' id='image-choice' name='image' value='image'>
+						<input type='checkbox' id='image-choice' name='fileType' value='image'>
 						<label for='image'>Images (.jpg, .png)</label><br>
-						<input type='checkbox' id='text-choice' name='text' value='text'>
+						<input type='checkbox' id='text-choice' name='fileType' value='text'>
 						<label for='text'>Text files (.txt, .md)</label><br>
-						<input type='checkbox' id='video-choice' name='video' value='video'>
-						<label for='video'>Videos (.mp3, .mov)</label><br>
-						<input type='checkbox' id='document-choice' name='document' value='document'>
+						<input type='checkbox' id='video-choice' name='fileType' value='video'>
+						<label for='video'>Videos (.mp4, .mov, .webm)</label><br>
+						<input type='checkbox' id='document-choice' name='fileType' value='document'>
 						<label for='document'>Documents (.docx, .doc)</label><br>
 					</div>
 					<div>
