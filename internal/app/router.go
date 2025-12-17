@@ -26,6 +26,8 @@ func (s *Server) BuildRouterDev() *mux.Router {
 	r.HandleFunc("/organize/preview", s.PreviewHandler).Methods("POST")
 	// Receive target data
 	r.HandleFunc("/target", s.TargetHandler).Methods("POST")
+	// Receive rule data
+	r.HandleFunc("/rule", s.RuleHandler).Methods("POST")
 	/*
 		Add all handlers here...
 	*/

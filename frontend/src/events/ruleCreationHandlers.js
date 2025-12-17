@@ -24,21 +24,21 @@ function buildRuleFromForm(formData) {
 			"size": {
 				"comparator": {
 					"gt": false,
-					"lt": false,
+					"lt": false
 				},
 
-				"value": null,
+				"value": 0,
 
 				"unit": {
 					"mb": false,
-					"gb": false,
+					"gb": false
 				},
 			},
 			"created": {
-				"before": null,
-				"after": null,
+				"before": "",
+				"after": ""
 			},
-		}, 
+		},
 		"then": {
 			"move_to": store.activeTarget.targetName
 		}
@@ -93,7 +93,9 @@ function buildRuleFromForm(formData) {
 
 			case 'size':
 				console.log("Firing in size block: " + entry);
-				ruleJson.when.size.value = val;
+				console.log("Type of size value: " + typeof(val));
+				
+				ruleJson.when.size.value = Number(val);
 				break;
 
 			case 'unit':
@@ -120,6 +122,9 @@ function buildRuleFromForm(formData) {
 	}
 
 	console.log(ruleJson);
+	for (const key in ruleJson) { 
+		console.log("Type of " + key + ": " + typeof(ruleJson[key]));
+	}
 	return ruleJson;
 
 }
