@@ -1,4 +1,5 @@
 import { store } from '../state.js';
+import { postRuleJson } from '../api';
 
 export async function onRuleSubmit(event, root) { 
 	event.preventDefault();
@@ -7,11 +8,9 @@ export async function onRuleSubmit(event, root) {
 
 	// This allows us to get the form data as key:value pairs
 	const formData = new FormData(form);
-	//for (var pair of formData.entries()) {
-	//	console.log(pair[0] + ": " + pair[1]);
-	//}
-	buildRuleFromForm(formData);
-
+	// Build json object from rule input
+	const ruleJson = buildRuleFromForm(formData);
+	const response = await postRuleJson(ruleJson);
 	
 }
 
@@ -23,8 +22,17 @@ function buildRuleFromForm(formData) {
 			"mime_type": [],
 			"name_contains": "",
 			"size": {
-				"gt": null,
-				"lt": null,
+				"comparator": {
+					"gt": false,
+					"lt": false,
+				},
+
+				"value": null,
+
+				"unit": {
+					"mb": false,
+					"gb": false,
+				},
 			},
 			"created": {
 				"before": null,
@@ -67,22 +75,51 @@ function buildRuleFromForm(formData) {
 				break;
 			case 'nameContains':
 				console.log("Firing in nc block: " + entry);
+				ruleJson.when.name_contains = val.trim();
 				break;
 
 			case 'comparator':
 				console.log("Firing in comp block: " + entry);
+				switch(val) { 
+					case 'lt':
+						ruleJson.when.size.comparator.lt = true;
+						break;
+					
+					case 'gt':
+						ruleJson.when.size.comparator.gt = true;
+						break;
+				}
 				break;
 
 			case 'size':
 				console.log("Firing in size block: " + entry);
+				ruleJson.when.size.value = val;
 				break;
 
 			case 'unit':
+
 				console.log("Firing in unit block: " + entry);
+				switch(val) { 
+					case 'mb':
+						ruleJson.when.size.unit.mb = true;
+						break;
+					
+					case 'gb':
+						ruleJson.when.size.unit.gb = true;
+						break;
+				}
+				break;
+			case 'dateBefore':
+				ruleJson.when.created.before = val;
+				break;
+
+			case 'dateAfter':
+				ruleJson.when.created.after = val;
 				break;
 		} 
 	}
 
 	console.log(ruleJson);
+	return ruleJson;
 
 }
