@@ -30,11 +30,13 @@ export default function RuleCreation(root, user) {
 					<div> <!-- Need to include greater than/less than options for file size -->
 						<label><strong>File size:</strong>  </label>
 						<select name='comparator' id='comparator'>
+							<option value="" selected disabled hidden>Select</option>
 							<option value='lt'>less than</option>
 							<option value='gt'>greater than</option>
 						</select>
 						<input type='number' name='size' id='file-size'>
 						<select name='unit' id='unit'>
+							<option value="" selected disabled hidden>Select</option>
 							<option value='mb'>MB</option>
 							<option value='gb'>GB</option>
 						</select>

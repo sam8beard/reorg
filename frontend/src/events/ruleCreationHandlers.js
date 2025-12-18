@@ -9,13 +9,23 @@ export async function onRuleSubmit(event, root) {
 	// This allows us to get the form data as key:value pairs
 	const formData = new FormData(form);
 	// Build json object from rule input
-	const ruleJson = buildRuleFromForm(formData);
+	let ruleJson; 
+	try { 
+		ruleJson = buildRuleFromForm(formData);
+	} catch(err) {
+		alert(err.message);
+		return;
+	}
 	const response = await postRuleJson(ruleJson);
-	
 }
 
 /* Builds the rule object from the form data on the rule creation page */
 function buildRuleFromForm(formData) { 
+	// Flags to keep track of file size input fields
+	let sizeProvided = false;
+	let comparatorProvided = false;
+	let unitProvided = false;
+
 	const ruleJson = { 
 		"when": {
 			"extension": [],
@@ -27,7 +37,7 @@ function buildRuleFromForm(formData) {
 					"lt": false
 				},
 
-				"value": 0,
+				"value": null,
 
 				"unit": {
 					"mb": false,
@@ -79,6 +89,7 @@ function buildRuleFromForm(formData) {
 				break;
 
 			case 'comparator':
+				comparatorProvided = true;
 				console.log("Firing in comp block: " + entry);
 				switch(val) { 
 					case 'lt':
@@ -92,14 +103,17 @@ function buildRuleFromForm(formData) {
 				break;
 
 			case 'size':
+				if (val !== '') {
+					sizeProvided = true;
+					ruleJson.when.size.value = Number(val);
+				}
 				console.log("Firing in size block: " + entry);
 				console.log("Type of size value: " + typeof(val));
 				
-				ruleJson.when.size.value = Number(val);
 				break;
 
 			case 'unit':
-
+				unitProvided = true;
 				console.log("Firing in unit block: " + entry);
 				switch(val) { 
 					case 'mb':
@@ -120,7 +134,13 @@ function buildRuleFromForm(formData) {
 				break;
 		} 
 	}
-
+	
+	// If invalid file size input provided
+	const anySizeField = sizeProvided || comparatorProvided || unitProvided;
+	const allSizeField = sizeProvided && comparatorProvided && unitProvided 
+	if (anySizeField && !allSizeField) {
+		throw new Error('File size field requires a comparator, value, and unit'); 
+	}
 	console.log(ruleJson);
 	for (const key in ruleJson) { 
 		console.log("Type of " + key + ": " + typeof(ruleJson[key]));
