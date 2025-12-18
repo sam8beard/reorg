@@ -43,5 +43,4 @@ func (s *Server) RuleHandler(w http.ResponseWriter, r *http.Request) {
 	// Pretty printing rule struct for testing
 	jsonRule, _ := json.MarshalIndent(ruleJson, "", " ")
 	log.Println(string(jsonRule))
-
 }

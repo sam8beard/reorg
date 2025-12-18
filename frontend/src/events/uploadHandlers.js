@@ -141,8 +141,9 @@ export async function onFileSubmit(e, root) {
 	} else {
 	// what page should we transition to or how should we modify the dom post upload? 
 		preview.innerText = "Files uploaded";
-		uploadBtn.style.display= 'none';
-		uploadBtn.disabled= true;
+		root.querySelector('#drop-zone').style.display = 'none';
+		uploadBtn.style.display = 'none';
+		uploadBtn.disabled = true;
 		organizeBtn.style.display = 'block';
 		organizeBtn.disabled = false;
 
