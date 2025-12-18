@@ -40,7 +40,11 @@ func (s *Server) RuleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
 	// Pretty printing rule struct for testing
 	jsonRule, _ := json.MarshalIndent(ruleJson, "", " ")
 	log.Println(string(jsonRule))
+
+	// Gotta decide whether or not a separate table for rules vs rule sets
+	// Could use ruleset id as a foreign key in each rule table row
 }

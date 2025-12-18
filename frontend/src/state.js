@@ -12,9 +12,20 @@ const initialState = {
 		sessionID: null,
 		files: []
 	},
+	
+	// { targetUUID, targetName } 
 	targets: [],
+
+	// { ruleUUID, name, conditions }
 	rules: [],
+
+	// { ruleUUID, targetUUID }
+	ruleBindings: [],
+
+	// UI state
 	activeTarget: null,
+	activeRule: null,
+
 	resultZipURL: null,
 	loginError: null,
 };
