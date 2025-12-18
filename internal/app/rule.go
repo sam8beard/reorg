@@ -40,5 +40,8 @@ func (s *Server) RuleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	log.Printf("Rule set from frontend: %v", ruleJson)
+	// Pretty printing rule struct for testing
+	jsonRule, _ := json.MarshalIndent(ruleJson, "", " ")
+	log.Println(string(jsonRule))
+
 }
