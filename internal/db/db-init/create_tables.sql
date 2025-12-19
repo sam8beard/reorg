@@ -28,16 +28,27 @@ CREATE TABLE rulesets (
 	ruleset_uuid UUID NOT NULL DEFAULT gen_random_uuid(),
 	user_id INTEGER REFERENCES users(id) NULL, --nullable for guests--
 	name TEXT NOT NULL, 
-	rules_json JSONB NOT NUll,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE targets ( 
+CREATE TABLE rules (
 	id SERIAL PRIMARY KEY,
-	target_uuid UUID NOT NULL UNIQUE,
-	user_id INTEGER REFERENCES users(id),
-	name TEXT NOT NULL, 
-	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	rule_uuid UUID NOT NULL DEFAULT gen_random_uuid(),
+	user_id INTEGER REFERENCES users(id) NULL,
+	name TEXT NOT NULL,
+	conditions_json JSONB NOT NULL,
+	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	UNIQUE (user_id, name)
+);
+
+CREATE TABLE rule_bindings (
+	id SERIAL PRIMARY KEY,
+	-- if the referenced rulesets row is deleted, delete all rows that reference it in this table --
+	ruleset_id INTEGER REFERENCES rulesets(id) ON DELETE CASCADE,
+	-- if the referenced rules row is deleted, delete all rows that reference it in this table --
+	rule_id INTEGER REFERENCES rules(id) ON DELETE CASCADE,
+	target_uuid UUID NOT NULL,
+	target_name TEXT NOT NULL
 );
 
 CREATE TABLE jobs (
@@ -45,7 +56,7 @@ CREATE TABLE jobs (
 	job_uuid UUID NOT NULL DEFAULT gen_random_uuid(),
 	user_id INTEGER REFERENCES users(id) NULL, --nullable for guests--
 	upload_id INTEGER REFERENCES uploads(id),
-	ruleset_json JSONB NOT NULL,
+	ruleset_id INTEGER REFERENCES rulesets(id),
 	status TEXT NOT NULL,
 	result_path TEXT,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

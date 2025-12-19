@@ -8,7 +8,6 @@ echo -e "[SERVER]\n\n"
 echo -e "building server...\n" 
 go build -o reorg-dev cmd/server/main.go
 chmod +x reorg-dev
-sleep 2
 
 echo -e "server built successfully\n"
 
