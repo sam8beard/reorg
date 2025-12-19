@@ -5,7 +5,6 @@ export async function fetchHealth() {
 	var healthURL = DEV_API_BASE + "/health";
 	try {
 		const response = await axios.get(healthURL);
-		console.log(response.data);
 		return response
 	} catch (error) {
 		console.error('Error fetching health:', error);

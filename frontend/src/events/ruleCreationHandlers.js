@@ -12,21 +12,44 @@ export async function onRuleSubmit(event, root) {
 	let ruleJson; 
 	try { 
 		ruleJson = buildRuleFromForm(formData);
+		store.activeRule = ruleJson.ruleUUID;
+		addRule(ruleJson);
+		addRuleBinding(ruleJson);
 	} catch(err) {
 		alert(err.message);
 		return;
 	}
-	const response = await postRuleJson(ruleJson);
+
+	// What should we present the user with after adding a rule? 
+	//
+	// Present preview option?
+}
+
+/* Adds a new rule to user state */
+function addRule(rule) { 
+	store.rules = [...store.rules, rule]
+}
+
+/* Adds a new rule binding to user state */
+function addRuleBinding(rule) {
+	store.ruleBindings = [
+		...store.ruleBindings,
+		{ "ruleUUID": rule.ruleUUID, "targetUUID": store.activeTarget.targetUUID }
+	];
 }
 
 /* Builds the rule object from the form data on the rule creation page */
 function buildRuleFromForm(formData) { 
-	// Flags to keep track of file size input fields
+	// Flags to keep track of input fields
+	let nameProvided = false;
+	let fileTypeProvided = false;
 	let sizeProvided = false;
 	let comparatorProvided = false;
 	let unitProvided = false;
 
 	const ruleJson = { 
+		"ruleUUID": crypto.randomUUID(),
+		"ruleName": null,
 		"when": {
 			"extension": [],
 			"mime_type": [],
@@ -50,7 +73,7 @@ function buildRuleFromForm(formData) {
 			},
 		},
 		"then": {
-			"move_to": store.activeTarget.targetName
+			"move_to": store.activeTarget.targetUUID
 		}
 	}
 	for (var entry of formData.entries()) {
@@ -58,39 +81,45 @@ function buildRuleFromForm(formData) {
 		var val = entry[1];
 		switch(key) { 
 			// handles the rule building for file type matching
+			case 'ruleName':
+				if (val !== '') { 
+					nameProvided = true;
+					ruleJson.ruleName = val.trim();
+				}
+				break;
 			case 'fileType':
-				console.log("Firing in ft block: " + entry);
-				switch(val) {
-					case 'image':
-						ruleJson.when.extension.push(".jpg",".png",".svg",".gif");
-						ruleJson.when.mime_type.push("image/jpeg","image/png","image/gif");
-						break;
-					case 'pdf':
-						ruleJson.when.extension.push(".pdf");
-						ruleJson.when.mime_type.push("application/pdf");
-						break;
-					case 'text':
-						ruleJson.when.extension.push(".txt", ".md");
-						ruleJson.when.mime_type.push("text/plain", "text/markdown");
-						break;
-					case 'video':
-						ruleJson.when.extension.push(".mp4", ".mov", ".webm");
-						ruleJson.when.mime_type.push("video/mp4", "video/webm", "video/quicktime");
-						break;
-					case 'document':
-						ruleJson.when.extension.push(".doc", ".docx");
-						ruleJson.when.mime_type.push("application/msword");
-						break;
+				if (val !== '') {
+					fileTypeProvided = true;
+					switch(val) {
+						case 'image':
+							ruleJson.when.extension.push(".jpg",".png",".svg",".gif");
+							ruleJson.when.mime_type.push("image/jpeg","image/png","image/gif");
+							break;
+						case 'pdf':
+							ruleJson.when.extension.push(".pdf");
+							ruleJson.when.mime_type.push("application/pdf");
+							break;
+						case 'text':
+							ruleJson.when.extension.push(".txt", ".md");
+							ruleJson.when.mime_type.push("text/plain", "text/markdown");
+							break;
+						case 'video':
+							ruleJson.when.extension.push(".mp4", ".mov", ".webm");
+							ruleJson.when.mime_type.push("video/mp4", "video/webm", "video/quicktime");
+							break;
+						case 'document':
+							ruleJson.when.extension.push(".doc", ".docx");
+							ruleJson.when.mime_type.push("application/msword");
+							break;
+					}
 				}
 				break;
 			case 'nameContains':
-				console.log("Firing in nc block: " + entry);
 				ruleJson.when.name_contains = val.trim();
 				break;
 
 			case 'comparator':
 				comparatorProvided = true;
-				console.log("Firing in comp block: " + entry);
 				switch(val) { 
 					case 'lt':
 						ruleJson.when.size.comparator.lt = true;
@@ -107,14 +136,11 @@ function buildRuleFromForm(formData) {
 					sizeProvided = true;
 					ruleJson.when.size.value = Number(val);
 				}
-				console.log("Firing in size block: " + entry);
-				console.log("Type of size value: " + typeof(val));
 				
 				break;
 
 			case 'unit':
 				unitProvided = true;
-				console.log("Firing in unit block: " + entry);
 				switch(val) { 
 					case 'mb':
 						ruleJson.when.size.unit.mb = true;
@@ -135,6 +161,16 @@ function buildRuleFromForm(formData) {
 		} 
 	}
 	
+	// If rule name is not provided 
+	if (!nameProvided) { 
+		throw new Error('Rule name must be provided');
+	}
+
+	// If at least one file type is not provided
+	if (!fileTypeProvided) { 
+		throw new Error('At least one file type must be provided');
+	}
+
 	// If invalid file size input provided
 	const anySizeField = sizeProvided || comparatorProvided || unitProvided;
 	const allSizeField = sizeProvided && comparatorProvided && unitProvided 

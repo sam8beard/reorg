@@ -2,7 +2,7 @@
  * Handlers and utils for organize page related actions
  */
 import { showOrganize, showRuleCreation } from '../navigation.js';
-import { fetchFiles, postTarget } from '../api';
+import { fetchFiles } from '../api';
 import { store } from '../state.js';
 
 export async function onOrganizePageClick(e, root) {
@@ -87,8 +87,6 @@ async function onCreateDirFormSubmit(event, createDirContainer) {
 	store.targets.push({targetUUID, targetName});
 	const target = { targetUUID: targetUUID, targetName: targetName}
 	store.activeTarget = target
-	// I don't think we want to post the target here yet...
-	//const response = await postTarget(targetUUID, targetName);
 	showRuleCreation()
 }
 

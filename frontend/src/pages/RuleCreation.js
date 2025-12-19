@@ -11,6 +11,10 @@ export default function RuleCreation(root, user) {
 				<!-- Implement some external module for the multiselect dropdown -->
 				<form id='rule-option-form' method='post'>
 					<div>
+						<label for='ruleName'><strong>Rule name: </strong> </label><br>
+						<input type='text' id='rule-name' name='ruleName'>
+					</div>
+					<div>
 						<label for='fileType'><strong>Move files of type:</strong> </label><br>
 						<input type='checkbox' id='pdf-choice' name='fileType' value='pdf'>
 						<label for='pdf'>PDF (.pdf)</label><br>
@@ -50,7 +54,7 @@ export default function RuleCreation(root, user) {
 						<input name='dateAfter' type='date' id='date-after'>
 					</div>
 					<div>
-						<button id='rule-btn' type='submit'>Add rules</button>
+						<button id='rule-btn' type='submit'>Add rule</button>
 					</div>
 				</form>
 			</div>

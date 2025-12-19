@@ -41,28 +41,21 @@ renderPage();
 
 /* Show landing page */
 export function showLanding() { 
-	logPageVisit('landing');
 	store.currentPage = 'landing';
 }
 
 /* Show sign up page */
 export function showSignup() {
-	// notifiy server on page visit
-	logPageVisit('signup');
 	store.currentPage = 'signup';
 }
 
 /* Show log in page */
 export function showLogin() { 
-	// notify server on page visit
-	logPageVisit('login');
 	store.currentPage = 'login';
 }
 
 /* Show home page */
 export function showHome(userData) { 
-	// notify server on page visit
-	logPageVisit('home');
 	store.user = userData;
 	store.isLoggedIn = true;
 	store.loginError = null;
@@ -76,22 +69,16 @@ export function showHome(userData) {
 
 /* Show upload page */
 export function showUpload() { 
-	// notify server on page visit
-	logPageVisit('upload');
 	store.currentPage = 'upload';
 }
 
 /* Show organize page */
 export function showOrganize() { 
-	// notify server on page visit
-	logPageVisit('organize');
 	store.currentPage = 'organize';
 }
 
 /* Show rule creation page */
 export function showRuleCreation() { 
-	// notify server on page visit
-	logPageVisit('ruleCreation');
 	store.currentPage = 'ruleCreation';
 }
 
