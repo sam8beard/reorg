@@ -38,7 +38,7 @@ export default function Upload(root, userData) {
 
 					<div>
 						<button style='margin-top: 6em;' id='upload-btn' type='submit'>Upload</button>
-						<button style='display:none; margin-top: 6em;' id='organize-page-btn' type='click' disabled='true'>Organize</button>
+						<button style='display:none; margin-top: 6em;' id='organize-page-btn' type='button' disabled='true'>Organize</button>
 					</div>
 
 				</form> 

@@ -116,7 +116,7 @@ export async function onFileSubmit(e, root) {
 	if (!files || files.length === 0) { 
 		// Display some message on DOM 
 		// indicating no files were selected
-		console.log("No files selected");
+		alert("Please select at least one file to upload");
 		return;
 	}
 
