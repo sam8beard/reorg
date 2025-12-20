@@ -64,7 +64,9 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 			// File is found
 			// Insert each file into minio bucket under upload id
 			var opts minio.PutObjectOptions
-			objKey := fmt.Sprintf("%s/%s", uploadUUID, part.FileName())
+	  // Generate file uuid for db write
+			fileUUID := uuid.New()
+			objKey := fmt.Sprintf("%s/%s_%s", uploadUUID, fileUUID, part.FileName())
 			uploadInfo, minioErr := s.Minio.PutObject(context.Background(), s.MinioBucket, objKey, part, -1, opts)
 			if minioErr != nil {
 				log.Printf("error from minio put object call: %v", minioErr)
@@ -80,8 +82,7 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 			// Get file size for db write
 			fileSize := uploadInfo.Size
-			// Generate file uuid for db write
-			fileUUID := uuid.New()
+		
 			// Insert row in files table
 			_, dbErr := s.DB.Exec(
 				context.Background(),
