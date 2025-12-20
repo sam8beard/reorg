@@ -72,12 +72,14 @@ export async function dropHandler(e, root, preview) {
 	// displayFiles(dt.files, preview);
 	for (const file of dt.files) { 
 		console.log(file.name);
-	} 
+	}
 	// store dropped files in file input for submission
 	const input = root.querySelector("#dir-input");
 	//const dt = new DataTransfer();
 	//for (const file of items) dt.items.add(file);
 	input.files = dt.files;
+	console.log("DEBUG: ", dt.files);
+	console.log("Files: ", input.files);
 	displayFiles(dt.files, preview)
 }
 
@@ -125,12 +127,12 @@ export async function onFileSubmit(e, root) {
 		const path = file.webkitRelativePath || file.name;
 		console.log(path);
 		formData.append("files", file, path); 
-	} 
+	}
 
-	// upload files
+	// Upload files
 	const response = await uploadFileForm(formData);
 
-	// alter frontend state
+	// Alter frontend state
 	const preview = root.querySelector("#file-preview");
 	const uploadBtn = root.querySelector("#upload-btn");
 	const organizeBtn = root.querySelector("#organize-page-btn");
