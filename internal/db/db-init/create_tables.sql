@@ -23,9 +23,11 @@ CREATE TABLE files (
 	file_uuid UUID NOT NULL UNIQUE,
 	upload_id INTEGER REFERENCES uploads(id) ON DELETE CASCADE,
 	upload_uuid UUID REFERENCES uploads(upload_uuid) ON DELETE CASCADE,
-	file_name TEXT NOT NULL,
+	name TEXT NOT NULL,
 	s3_key TEXT NOT NULL,
 	size INTEGER NOT NULL,
+	mime_type TEXT NOT NULL,
+	original_timestamp TIMESTAMPTZ NOT NULL,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

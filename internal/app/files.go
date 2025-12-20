@@ -33,12 +33,11 @@ func (s *Server) FileHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Convert body to int to access upload UUID
 	uploadUUID := string(body)
-	log.Printf("Should be of type string: %T", uploadUUID)
 
 	// Use upload ID to query all s3_keys of matching rows in files table
 	fileRows, dbErr := s.DB.Query(
 		context.Background(),
-		"SELECT file_name FROM files WHERE upload_uuid = $1",
+		"SELECT name FROM files WHERE upload_uuid = $1",
 		uploadUUID,
 	)
 	if dbErr != nil {

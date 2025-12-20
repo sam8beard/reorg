@@ -124,9 +124,7 @@ export async function onFileSubmit(e, root) {
 
 	const formData = new FormData();
 	for (const file of files) {
-		const path = file.webkitRelativePath || file.name;
-		console.log(path);
-		formData.append("files", file, path); 
+		formData.append(file.name, file, file.lastModified); 
 	}
 
 	// Upload files
