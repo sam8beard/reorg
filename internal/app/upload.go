@@ -64,7 +64,7 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 			// File is found
 			// Insert each file into minio bucket under upload id
 			var opts minio.PutObjectOptions
-	  // Generate file uuid for db write
+			// Generate file uuid for db write
 			fileUUID := uuid.New()
 			objKey := fmt.Sprintf("%s/%s_%s", uploadUUID, fileUUID, part.FileName())
 			uploadInfo, minioErr := s.Minio.PutObject(context.Background(), s.MinioBucket, objKey, part, -1, opts)
@@ -82,14 +82,15 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 			// Get file size for db write
 			fileSize := uploadInfo.Size
-		
+
 			// Insert row in files table
 			_, dbErr := s.DB.Exec(
 				context.Background(),
-				"INSERT INTO files (upload_id, file_uuid, upload_uuid, s3_key, size) VALUES ((SELECT id FROM uploads WHERE upload_uuid = $1), $2, $3, $4, $5)",
+				"INSERT INTO files (upload_id, file_uuid, upload_uuid, file_name, s3_key, size) VALUES ((SELECT id FROM uploads WHERE upload_uuid = $1), $2, $3, $4, $5, $6)",
 				uploadUUID,
 				fileUUID,
 				uploadUUID,
+				part.FileName(),
 				objKey,
 				fileSize,
 			)

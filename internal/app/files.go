@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"path/filepath"
 )
 
 /* Get files that match a upload id in request */
@@ -39,7 +38,7 @@ func (s *Server) FileHandler(w http.ResponseWriter, r *http.Request) {
 	// Use upload ID to query all s3_keys of matching rows in files table
 	fileRows, dbErr := s.DB.Query(
 		context.Background(),
-		"SELECT s3_key FROM files WHERE upload_uuid = $1",
+		"SELECT file_name FROM files WHERE upload_uuid = $1",
 		uploadUUID,
 	)
 	if dbErr != nil {
@@ -55,12 +54,11 @@ func (s *Server) FileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Scan all rows and store s3 keys
-	s3Keys := make([]string, 0)
 	fileNames := make([]string, 0)
 	for fileRows.Next() {
 		log.Println("Scanning row...")
-		var key string
-		if dbErr := fileRows.Scan(&key); dbErr != nil {
+		var name string
+		if dbErr := fileRows.Scan(&name); dbErr != nil {
 			log.Printf("error scanning value from row: %v", dbErr)
 			w.Header().Set("Content-Type", "application/json")
 			http.Error(w, dbErr.Error(), http.StatusInternalServerError)
@@ -71,9 +69,7 @@ func (s *Server) FileHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		log.Printf("file name: %s", filepath.Base(key))
-		fileNames = append(fileNames, filepath.Base(key))
-		_ = append(s3Keys, key)
+		fileNames = append(fileNames, name)
 	}
 	log.Printf("file names: %v", fileNames)
 	w.Header().Set("Content-Type", "application/json")
