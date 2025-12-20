@@ -28,6 +28,8 @@ func (s *Server) BuildRouterDev() *mux.Router {
 	r.HandleFunc("/target", s.TargetHandler).Methods("POST")
 	// Receive rule data
 	r.HandleFunc("/rule", s.RuleHandler).Methods("POST")
+	// Return preview object based on ruleset
+	r.HandleFunc("/preview", s.PreviewHandler).Methods("POST")
 	/*
 		Add all handlers here...
 	*/

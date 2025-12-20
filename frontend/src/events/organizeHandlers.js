@@ -7,8 +7,8 @@ import { store } from '../state.js';
 
 export async function onOrganizePageClick(e, root) {
 	// Fetch files using upload ID for file preview on organize page
-	const uploadId = store.upload.uploadID
-	const response = await fetchFiles(uploadId);
+	const uploadUUID = store.upload.uploadUUID
+	const response = await fetchFiles(uploadUUID);
 	store.upload.files = response
 	showOrganize();
 }
@@ -69,24 +69,38 @@ async function onCreateDirClick(root) {
 	createDirForm.addEventListener('submit', (e) => onCreateDirFormSubmit(e, createDirContainer));
 }
 
+/* Updates targets in state */
+function addTarget(target) { 
+	store.targets = [...store.targets, target];
+}
+
 async function onCreateDirFormSubmit(event, createDirContainer) { 
 	event.preventDefault();
 	const form = event.target;
 
-	// generate id and name for new target
+	// Generate id and name for new target
 	const targetName = form.elements.dir.value.trim();
+
+	// If only whitespace is supplied as folder name
 	if (targetName === "") { 
 		const errMsg = createDirContainer.querySelector('#create-dir-error');
 		errMsg.innerText = "Must supply folder name";
 		return;
 	}
+	// Clear error message on success
 	createDirContainer.querySelector('#create-dir-error').innerText = "";	
-	const targetUUID = crypto.randomUUID();
 
-	// Do we want to store the ID along with the UUID??
-	store.targets.push({targetUUID, targetName});
-	const target = { targetUUID: targetUUID, targetName: targetName}
-	store.activeTarget = target
-	showRuleCreation()
+	// Build new target object
+	const targetUUID = crypto.randomUUID();
+	const target = { "targetUUID": targetUUID, "targetName": targetName};
+
+	// Update state with new target
+	addTarget(target);
+
+	// Set active target
+	store.activeTarget = target;
+
+	// Show rule creation page
+	showRuleCreation();
 }
 

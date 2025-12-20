@@ -1,8 +1,10 @@
 package models
 
 type Rule struct {
-	When Conditions `json:"when"`
-	Then Actions    `json:"then"`
+	RuleUUID string     `json:"ruleUUID"`
+	RuleName string     `json:"ruleName"`
+	When     Conditions `json:"when"`
+	Then     Actions    `json:"then"`
 }
 
 type Conditions struct {

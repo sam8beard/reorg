@@ -139,7 +139,6 @@ export async function onFileSubmit(e, root) {
 		preview.innerText = "Failed to upload files";
 		form.reset();
 	} else {
-	// what page should we transition to or how should we modify the dom post upload? 
 		preview.innerText = "Files uploaded";
 		root.querySelector('#drop-zone').style.display = 'none';
 		uploadBtn.style.display = 'none';
@@ -148,14 +147,12 @@ export async function onFileSubmit(e, root) {
 		organizeBtn.disabled = false;
 
 		// Use upload ID returned from backend response
-		store.upload.uploadID = response;
-		console.log("firing in upload handler, should be id and not uuid: " + store.upload.uploadID);
+		console.log("Firing in uploadHandlers: ", response);
+		store.upload.uploadUUID = response;
 		form.reset();
-
 	}
 
 	
 	
-	console.log(response);
 }
 

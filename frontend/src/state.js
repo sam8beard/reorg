@@ -8,7 +8,7 @@ const initialState = {
 	isLoggedIn: false,
 	currentPage: 'landing',
 	upload: {
-		uploadID: null,
+		uploadUUID: null,
 		sessionID: null,
 		files: []
 	},
@@ -16,7 +16,7 @@ const initialState = {
 	// { targetUUID, targetName } 
 	targets: [],
 
-	// { ruleUUID, name, conditions }
+	// { ruleUUID, name, when: {}, then: {} }
 	rules: [],
 
 	// { ruleUUID, targetUUID }
@@ -52,7 +52,6 @@ export const store = new Proxy(initialState, {
 		console.log('Old value: ', oldValue);
 		console.log('New value: ', value);
 		console.log("Updated state:\n", JSON.stringify(target, null, 2));
-
 		// Notify all subscribers
 		subscribers.forEach(fn => fn(prop, value)); 
 		return true;

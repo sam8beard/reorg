@@ -12,7 +12,7 @@ import (
 )
 
 func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
-	// Generate new upload ID
+	// Generate new upload UUID
 	uploadUUID := uuid.New()
 
 	// Close request body
@@ -44,7 +44,7 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 	if dbErr != nil {
 		log.Printf("error from db exec call: %v", dbErr)
 		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, dbErr.Error(), http.StatusInternalServerError)
 		encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not register upload with user"})
 		if encodeErr != nil {
 			log.Printf("failed to write response: %v", encodeErr)
@@ -56,9 +56,6 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Read files in chunks
 	for {
 		part, err := multiReader.NextPart()
-		//if part.FormName() == "user" {
-		//	log.Printf("should be user ID: %v", part)
-		//}
 		if err == io.EOF {
 			break
 		}
@@ -81,11 +78,16 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			// Get file size for db write
 			fileSize := uploadInfo.Size
+			// Generate file uuid for db write
+			fileUUID := uuid.New()
 			// Insert row in files table
 			_, dbErr := s.DB.Exec(
 				context.Background(),
-				"INSERT INTO files (upload_id, s3_key, size) VALUES ((SELECT id FROM uploads WHERE upload_uuid = $1), $2, $3)",
+				"INSERT INTO files (upload_id, file_uuid, upload_uuid, s3_key, size) VALUES ((SELECT id FROM uploads WHERE upload_uuid = $1), $2, $3, $4, $5)",
+				uploadUUID,
+				fileUUID,
 				uploadUUID,
 				objKey,
 				fileSize,
@@ -103,34 +105,16 @@ func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			// Text field found
-			data, _ := io.ReadAll(part)
-			log.Printf("field: %s \t value: %s\n", part.FormName(), string(data))
+			_, _ = io.ReadAll(part)
+
 		}
 
 	}
-	// Get upload id for reference in frontend state
-	var uploadId int
-	dbErr = s.DB.QueryRow(
-		context.Background(),
-		"SELECT id FROM uploads WHERE upload_uuid = $1",
-		uploadUUID,
-	).Scan(&uploadId)
-	if dbErr != nil {
-		log.Printf("error from db query row call: %v", dbErr)
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, dbErr.Error(), http.StatusInternalServerError)
-		encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not register upload with user"})
-		if encodeErr != nil {
-			log.Printf("failed to write response: %v", encodeErr)
-			return
-		}
-		return
-	}
 
-	// Return upload id in response
+	// Return upload UUID in response
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(uploadId); err != nil {
+	if err := json.NewEncoder(w).Encode(uploadUUID); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

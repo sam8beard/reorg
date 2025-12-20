@@ -2,12 +2,13 @@ import axios from 'axios';
 const DEV_API_BASE = "http://localhost:5173/api";
 
 /*
- * Fetch files using upload ID
+ * Fetch files using upload UUID
  */
-export async function fetchFiles(uploadId) { 
+export async function fetchFiles(uploadUUID) { 
 	const filesURL = DEV_API_BASE + "/files";
 	try { 
-		const response = await axios.post(filesURL, uploadId);
+		const response = await axios.post(filesURL, uploadUUID);
+		console.log(response.data);
 		return response.data;
 	} catch (err) {
 		if (err.response) { 

@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
-	"strconv"
 )
 
 /* Get files that match a upload id in request */
@@ -33,25 +32,15 @@ func (s *Server) FileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Convert body to int to access upload ID
-	uploadId, err := strconv.Atoi(string(body))
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not read request body"})
-		if encodeErr != nil {
-			log.Printf("failed to write response: %v", encodeErr)
-			return
-		}
-		return
-	}
-	log.Printf("Should be int: %d", uploadId)
+	// Convert body to int to access upload UUID
+	uploadUUID := string(body)
+	log.Printf("Should be of type string: %T", uploadUUID)
 
 	// Use upload ID to query all s3_keys of matching rows in files table
 	fileRows, dbErr := s.DB.Query(
 		context.Background(),
-		"SELECT s3_key FROM files WHERE upload_id = $1",
-		uploadId,
+		"SELECT s3_key FROM files WHERE upload_uuid = $1",
+		uploadUUID,
 	)
 	if dbErr != nil {
 		log.Printf("error from db query call: %v", dbErr)
@@ -93,30 +82,4 @@ func (s *Server) FileHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	/* For now, not going to return all file bodies, just names
-
-
-	// Fetch all files from bucket
-	for _, key := range s3Keys {
-		var opts minio.GetObjectOptions
-		file, err := s.Minio.GetObject(
-			context.Background(),
-			s.MinioBucket,
-			key,
-			opts,
-		)
-		if err != nil {
-			log.Printf("error getting object from bucket: %v", dbErr)
-			w.Header().Set("Content-Type", "application/json")
-			http.Error(w, dbErr.Error(), http.StatusInternalServerError)
-			encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not retrieve files"})
-			if encodeErr != nil {
-				log.Printf("failed to write response: %v", encodeErr)
-				return
-			}
-			return
-		}
-	}
-	*/
-
 }

@@ -1,6 +1,6 @@
 import { store } from '../state.js';
-import { postRuleJson } from '../api';
-
+import { postRuleJson, getPreviewJson } from '../api';
+import { showPreview } from '../navigation.js';
 export async function onRuleSubmit(event, root) { 
 	event.preventDefault();
 
@@ -8,26 +8,93 @@ export async function onRuleSubmit(event, root) {
 
 	// This allows us to get the form data as key:value pairs
 	const formData = new FormData(form);
-	// Build json object from rule input
+
+	// Build rule from form data and update preview
 	let ruleJson; 
+	let ruleSet;
 	try { 
+		// Build ruleJson and update state
 		ruleJson = buildRuleFromForm(formData);
 		store.activeRule = ruleJson.ruleUUID;
 		addRule(ruleJson);
 		addRuleBinding(ruleJson);
+		
+		// Build ruleSet and update state with preview
+		ruleSet = buildRuleSet();
+
+		// Debugging
+		console.log(JSON.stringify(ruleSet, null, 2));
+
+		// Get preview object from backend using ruleset object
+		store.preview = await getPreviewJson(ruleSet);
+	
+		// Debugging 
+		console.log(JSON.stringify(store.preview, null, 2));
+		
+		// Show preview page with updated preview
+		showPreview();
+
 	} catch(err) {
 		alert(err.message);
 		return;
 	}
-
 	// What should we present the user with after adding a rule? 
 	//
 	// Present preview option?
+	
 }
+
+/* Builds ruleset object from current state */
+function buildRuleSet() {
+	const ruleSet = {
+		"uploadUUID": store.upload.uploadUUID,
+		"fileNames": store.upload.files,
+		"targets": []
+	};
+
+	for (let binding of store.ruleBindings) { 
+		const ruleUUID = binding.ruleUUID;
+		const targetUUID = binding.targetUUID;
+		console.log("Target UUID: ", targetUUID);
+		console.log("ACTIVE target UUID: ", store.activeTarget.targetUUID);
+		// Get rule referenced in binding (should be unique)
+		let ruleToAdd;
+		for (let rule of store.rules) {
+			// We have found the matching rule
+			if (rule.ruleUUID === ruleUUID) {
+				ruleToAdd = rule;
+				console.log("Rule to add set: ", ruleToAdd);
+			}
+		}
+
+		// Get target referenced in binding (should be unique)
+		let targetToAdd;
+		for (let target of store.targets) {
+			console.log("Firing in target loop");
+			if (target.targetUUID === targetUUID) {
+				targetToAdd = target;
+				console.log("Target to add set: ", targetToAdd);
+			}
+		}
+	
+		// Make new target member with binded rule and target data
+		const newTarget = {
+			"targetUUID": targetToAdd.targetUUID,
+			"targetName": targetToAdd.targetName,
+			"rule": ruleToAdd
+		}
+		
+		// Populate targets list in ruleset
+		ruleSet.targets.push(newTarget);
+	}
+	
+	return ruleSet;
+}
+
 
 /* Adds a new rule to user state */
 function addRule(rule) { 
-	store.rules = [...store.rules, rule]
+	store.rules = [...store.rules, rule];
 }
 
 /* Adds a new rule binding to user state */
@@ -75,7 +142,9 @@ function buildRuleFromForm(formData) {
 		"then": {
 			"move_to": store.activeTarget.targetUUID
 		}
-	}
+	};
+
+	// Iterate through form input and populate ruleJson
 	for (var entry of formData.entries()) {
 		var key = entry[0];
 		var val = entry[1];

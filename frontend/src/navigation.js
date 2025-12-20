@@ -1,6 +1,6 @@
 /* Wrapper functions for showing a page based on state and user */
 import { store, subscribe } from './state.js';
-import { Landing, Signup, Login, Home, Upload, Organize, RuleCreation } from './pages';
+import { Landing, Signup, Login, Home, Upload, Organize, RuleCreation, Preview } from './pages';
 
 export function renderPage() { 
 	const root = document.getElementById('root');
@@ -26,7 +26,9 @@ export function renderPage() {
 		case 'ruleCreation':
 			RuleCreation(root, store.user);
 			break
-
+		case 'preview':
+			Preview(root, store.user);
+			break;
 		/*
 		 * Additional pages go here
 		 *
@@ -80,6 +82,11 @@ export function showOrganize() {
 /* Show rule creation page */
 export function showRuleCreation() { 
 	store.currentPage = 'ruleCreation';
+}
+
+/* Show preview page */
+export function showPreview() {
+	store.currentPage = 'preview';
 }
 
 /* Util for logging page visit */

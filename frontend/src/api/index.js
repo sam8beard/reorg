@@ -3,3 +3,4 @@ export * from './user.js';
 export * from './upload.js';
 export * from './files.js';
 export * from './rule.js';
+export * from './preview.js';

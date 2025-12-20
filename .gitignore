@@ -41,7 +41,7 @@ vendor/
 notes/
 
 # Vim sessions
-.vim
+*.vim
 
 # Executables
 reorg-dev
