@@ -2,6 +2,6 @@ package models
 
 type RuleSet struct {
 	UploadUUID string   `json:"uploadUUID"`
-	FileNames  []string `json:"fileNames"`
+	Files      []File   `json:"files"`
 	Targets    []Target `json:"targets"`
 }

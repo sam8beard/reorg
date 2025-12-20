@@ -1,6 +1,7 @@
 import { store } from '../state.js';
 import { postRuleJson, getPreviewJson } from '../api';
 import { showPreview } from '../navigation.js';
+
 export async function onRuleSubmit(event, root) { 
 	event.preventDefault();
 
@@ -48,7 +49,7 @@ export async function onRuleSubmit(event, root) {
 function buildRuleSet() {
 	const ruleSet = {
 		"uploadUUID": store.upload.uploadUUID,
-		"fileNames": store.upload.files,
+		"files": store.upload.files,
 		"targets": []
 	};
 

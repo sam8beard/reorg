@@ -9,6 +9,11 @@ import (
 	"net/http"
 )
 
+type FileInfo struct {
+	Name     string `json:"fileName"`
+	FileUUID string `json:"fileUUID"`
+}
+
 /* Get files that match a upload id in request */
 func (s *Server) FileHandler(w http.ResponseWriter, r *http.Request) {
 	// Close request body
@@ -37,7 +42,7 @@ func (s *Server) FileHandler(w http.ResponseWriter, r *http.Request) {
 	// Use upload ID to query all s3_keys of matching rows in files table
 	fileRows, dbErr := s.DB.Query(
 		context.Background(),
-		"SELECT name FROM files WHERE upload_uuid = $1",
+		"SELECT name, file_uuid FROM files WHERE upload_uuid = $1",
 		uploadUUID,
 	)
 	if dbErr != nil {
@@ -53,11 +58,12 @@ func (s *Server) FileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Scan all rows and store s3 keys
-	fileNames := make([]string, 0)
+	files := make([]FileInfo, 0)
 	for fileRows.Next() {
 		log.Println("Scanning row...")
-		var name string
-		if dbErr := fileRows.Scan(&name); dbErr != nil {
+		var f FileInfo
+
+		if dbErr := fileRows.Scan(&f.Name, &f.FileUUID); dbErr != nil {
 			log.Printf("error scanning value from row: %v", dbErr)
 			w.Header().Set("Content-Type", "application/json")
 			http.Error(w, dbErr.Error(), http.StatusInternalServerError)
@@ -68,12 +74,12 @@ func (s *Server) FileHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		fileNames = append(fileNames, name)
+		files = append(files, f)
 	}
-	log.Printf("file names: %v", fileNames)
+	log.Printf("file names: %v", files)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(fileNames); err != nil {
+	if err := json.NewEncoder(w).Encode(files); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

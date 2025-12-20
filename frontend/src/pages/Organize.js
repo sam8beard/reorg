@@ -26,7 +26,7 @@ export default function Organize(root, userData) {
 	const fileList = root.querySelector('#file-list');
 	for (const file of store.upload.files) { 
 		const li = document.createElement("li");
-		li.appendChild(document.createTextNode(file));
+		li.appendChild(document.createTextNode(file.fileName));
 		fileList.appendChild(li);
 	}
 

@@ -10,6 +10,7 @@ const initialState = {
 	upload: {
 		uploadUUID: null,
 		sessionID: null,
+		// { fileUUID, fileName }
 		files: []
 	},
 	

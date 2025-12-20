@@ -9,10 +9,16 @@ export async function onOrganizePageClick(e, root) {
 	// Fetch files using upload ID for file preview on organize page
 	const uploadUUID = store.upload.uploadUUID
 	const response = await fetchFiles(uploadUUID);
-	store.upload.files = response
+	for (let file of response) { 
+		addFile(file);	
+	}
 	showOrganize();
 }
 
+/* Add file object to state */
+function addFile(file) {
+	store.upload.files = [...store.upload.files, file];
+}
 /* Helper functions for attaching event listeners */
 export function attachOrgAIHandler(btn, root) { 
 	btn.addEventListener('click', () => onOrgAIClick(root));

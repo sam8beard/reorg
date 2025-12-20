@@ -9,8 +9,6 @@ require (
 	github.com/minio/minio-go/v7 v7.0.97
 )
 
-require github.com/gabriel-vasile/mimetype v1.4.12 // indirect
-
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
