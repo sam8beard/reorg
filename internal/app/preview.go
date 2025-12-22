@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/sam8beard/reorg/internal/models"
 	"github.com/sam8beard/reorg/internal/rules"
@@ -30,9 +31,12 @@ func (s *Server) PreviewHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Unmarshal request body
 	ruleSet := models.RuleSet{}
+	fileMetadata := make(map[string]models.FileMetadata, 0)
+
+	// Unmarshal request body
 	if err := json.Unmarshal(body, &ruleSet); err != nil {
+		log.Printf("%v", err)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not decode request body"})
@@ -42,9 +46,58 @@ func (s *Server) PreviewHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	// Fetch metadata for each file from files table
+	metadataRows, dbErr := s.DB.Query(
+		context.Background(),
+		"SELECT upload_uuid, file_uuid, name, size, mime_type, original_timestamp FROM files WHERE upload_uuid = $1",
+		ruleSet.UploadUUID,
+	)
+	if dbErr != nil {
+		log.Printf("error from db query call: %v", dbErr)
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, dbErr.Error(), http.StatusInternalServerError)
+		encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not retrieve file metadata"})
+		if encodeErr != nil {
+			log.Printf("failed to write response: %v", encodeErr)
+			return
+		}
+		return
+	}
+
+	// Scan all metadata rows and store
+	for metadataRows.Next() {
+		log.Println("Scanning row...")
+		var md models.FileMetadata
+		dbErr := metadataRows.Scan(
+			&md.UploadUUID,
+			&md.FileUUID,
+			&md.FileName,
+			&md.Size,
+			&md.MimeType,
+			&md.OGTimestamp,
+		)
+		if dbErr != nil {
+			log.Printf("error scanning value from row: %v", dbErr)
+			w.Header().Set("Content-Type", "application/json")
+			http.Error(w, dbErr.Error(), http.StatusInternalServerError)
+			encodeErr := json.NewEncoder(w).Encode(map[string]string{"error": "could not scan metadata row"})
+			if encodeErr != nil {
+				log.Printf("failed to write response: %v", encodeErr)
+				return
+			}
+			return
+		}
+
+		// Debugging
+		log.Printf("File metadata: %+v\n\n", md)
+
+		// Store metadata for file
+		fileUUID := md.FileUUID
+		fileMetadata[fileUUID] = md
+	}
 
 	// Get evaluation result
-	_, err = rules.Evaluate(&ruleSet)
+	_, err = rules.Evaluate(&ruleSet, fileMetadata)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)

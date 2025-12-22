@@ -129,6 +129,13 @@ function buildRuleFromForm(formData) {
 	const ruleJson = { 
 		"ruleUUID": crypto.randomUUID(),
 		"ruleName": null,
+		"activeConditions": {
+			"extension": false, 
+			"mime_type": false, 
+			"name_contains": false,
+			"size": false, 
+			"created": false
+		},
 		"when": {
 			"extension": [],
 			"mime_type": [],
@@ -147,8 +154,8 @@ function buildRuleFromForm(formData) {
 				},
 			},
 			"created": {
-				"before": "",
-				"after": ""
+				"before": null,
+				"after": null
 			},
 		},
 		"then": {
@@ -171,6 +178,11 @@ function buildRuleFromForm(formData) {
 			case 'fileType':
 				if (val !== '') {
 					fileTypeProvided = true;
+
+					// Add active condition
+					ruleJson.activeConditions.extension = true;
+					ruleJson.activeConditions.mime_type = true;
+
 					switch(val) {
 						case 'image':
 							ruleJson.when.extension.push(".jpg",".png",".svg",".gif");
@@ -196,10 +208,17 @@ function buildRuleFromForm(formData) {
 				}
 				break;
 			case 'nameContains':
-				ruleJson.when.name_contains = val.trim();
+				const trimmed = val.trim();
+				if (trimmed !== '') { 
+					// Add active condition 
+					ruleJson.activeConditions.name_contains = true;
+					ruleJson.when.name_contains = trimmed;
+				}
+				
 				break;
 
 			case 'comparator':
+				console.log("comp: ", val);
 				comparatorProvided = true;
 				switch(val) { 
 					case 'lt':
@@ -214,6 +233,7 @@ function buildRuleFromForm(formData) {
 
 			case 'size':
 				if (val !== '') {
+					console.log("size: ", val);
 					sizeProvided = true;
 					ruleJson.when.size.value = Number(val);
 				}
@@ -221,6 +241,7 @@ function buildRuleFromForm(formData) {
 				break;
 
 			case 'unit':
+				console.log("unit: ", val);
 				unitProvided = true;
 				switch(val) { 
 					case 'mb':
@@ -232,12 +253,23 @@ function buildRuleFromForm(formData) {
 						break;
 				}
 				break;
+
 			case 'dateBefore':
-				ruleJson.when.created.before = val;
+				if (val !== '') {
+					const timestamp = Date.parse(val);
+					ruleJson.when.created.after = timestamp;
+					// Add active condition
+					ruleJson.activeConditions.created = true;
+				}
 				break;
 
 			case 'dateAfter':
-				ruleJson.when.created.after = val;
+				if (val !== '') {
+					const timestamp = Date.parse(val);
+					ruleJson.when.created.after = timestamp;
+					// Add active condition
+					ruleJson.activeConditions.created = true;
+				}
 				break;
 		} 
 	}
@@ -247,17 +279,22 @@ function buildRuleFromForm(formData) {
 		throw new Error('Rule name must be provided');
 	}
 
-	// If at least one file type is not provided
-	if (!fileTypeProvided) { 
-		throw new Error('At least one file type must be provided');
-	}
-
 	// If invalid file size input provided
 	const anySizeField = sizeProvided || comparatorProvided || unitProvided;
-	const allSizeField = sizeProvided && comparatorProvided && unitProvided 
+	const allSizeField = sizeProvided && comparatorProvided && unitProvided;
 	if (anySizeField && !allSizeField) {
 		throw new Error('File size field requires a comparator, value, and unit'); 
+	} else if (allSizeField) {
+		// Add active condition
+		ruleJson.activeConditions.size = true;
 	}
+	
+	// If no conditions are provided
+	const anyConditionProvided = ruleJson.activeConditions.extension || ruleJson.activeConditions.mime_type || ruleJson.activeConditions.name_contains || ruleJson.activeConditions.size || ruleJson.activeConditions.created;
+	if (nameProvided && !anyConditionProvided) {
+		throw new Error(`Please provide at least one condition for ${ruleJson.ruleName}`);
+	}
+
 	console.log(ruleJson);
 	for (const key in ruleJson) { 
 		console.log("Type of " + key + ": " + typeof(ruleJson[key]));

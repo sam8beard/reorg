@@ -1,18 +1,19 @@
 package models
 
 type Rule struct {
-	RuleUUID string     `json:"ruleUUID"`
-	RuleName string     `json:"ruleName"`
-	When     Conditions `json:"when"`
-	Then     Actions    `json:"then"`
+	RuleUUID         string          `json:"ruleUUID"`
+	RuleName         string          `json:"ruleName"`
+	ActiveConditions map[string]bool `json:"activeConditions"`
+	Conditions       Conditions      `json:"when"`
+	Actions          Actions         `json:"then"`
 }
 
 type Conditions struct {
 	Extensions   []string `json:"extension,omitempty"`
 	MimeType     []string `json:"mime_type,omitempty"`
 	NameContains string   `json:"name_contains,omitempty"`
-	FileSize     FileSize `json:"size"`
-	Created      Created  `json:"created"`
+	FileSize     FileSize `json:"size,omitempty"`
+	Created      Created  `json:"created,omitempty"`
 }
 type FileSize struct {
 	Comparator Comparator `json:"comparator"`
@@ -31,8 +32,8 @@ type Comparator struct {
 }
 
 type Created struct {
-	Before string `json:"before,omitempty"`
-	After  string `json:"after,omitempty"`
+	Before int64 `json:"before,omitempty"`
+	After  int64 `json:"after,omitempty"`
 }
 
 type Actions struct {
