@@ -16,8 +16,14 @@ export async function onRuleSubmit(event, root) {
 	try { 
 		// Build ruleJson and update state
 		ruleJson = buildRuleFromForm(formData);
+
+		// Set active rule in state
 		store.activeRule = ruleJson.ruleUUID;
+
+		// Add rule to state
 		addRule(ruleJson);
+
+		// Add rule binding to state
 		addRuleBinding(ruleJson);
 		
 		// Build ruleSet and update state with preview
@@ -39,9 +45,6 @@ export async function onRuleSubmit(event, root) {
 		alert(err.message);
 		return;
 	}
-	// What should we present the user with after adding a rule? 
-	//
-	// Present preview option?
 	
 }
 
@@ -49,11 +52,19 @@ export async function onRuleSubmit(event, root) {
 function buildRuleSet() {
 	const ruleSet = {
 		"uploadUUID": store.upload.uploadUUID,
-		"files": store.upload.files,
-		"targets": []
+		//"files": store.upload.files,
+		"files": {},
+		//"targets": []
+		"targets": {}
 	};
+	
+	// Populate files object
+	for (let file of store.upload.files) {
+		ruleSet.files[file.fileUUID] = file;
+	}
 
-	for (let binding of store.ruleBindings) { 
+	// Populate targets object using rule bindings
+	for (let binding of store.ruleBindings) {
 		const ruleUUID = binding.ruleUUID;
 		const targetUUID = binding.targetUUID;
 		console.log("Target UUID: ", targetUUID);
@@ -86,7 +97,7 @@ function buildRuleSet() {
 		}
 		
 		// Populate targets list in ruleset
-		ruleSet.targets.push(newTarget);
+		ruleSet.targets[newTarget.targetUUID] = newTarget;
 	}
 	
 	return ruleSet;

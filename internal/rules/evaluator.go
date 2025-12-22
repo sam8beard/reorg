@@ -24,5 +24,15 @@ func Evaluate(ruleSet *models.RuleSet) (*models.EvaluationResult, error) {
 		This is the driving force behind the application
 	*/
 
+	// Grab upload UUID, files, and targets from ruleset
+	uploadUUID := ruleSet.UploadUUID
+	files := ruleSet.Files
+	targets := ruleSet.Targets
+
+	// Debugging
+	log.Printf("Upload UUID: \n%s\n\n", uploadUUID)
+	log.Printf("Files list: \n%+v\n\n", files)
+	log.Printf("Targets list: \n%+v\n\n", targets)
+
 	return &evalResult, nil
 }
