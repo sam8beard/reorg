@@ -19,6 +19,7 @@ services:
   # MinIO object storage
   obj-store:
     image: quay.io/minio/minio:latest
+    # Add start-up script to config minio using mc?
     container_name: obj-store
     ports:
       - 9000:9000
@@ -30,7 +31,7 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server /data --console-address ":9001"
 
-  # PGAdmin for dev
+  # PGAdmin
   pgadmin: 
     image: dpage/pgadmin4
     container_name: pgadmin
@@ -43,3 +44,9 @@ services:
       - ./internal/pgadmin/pgadmin-data:/var/lib/pgadmin
     depends_on: 
       - db
+
+  # Application
+  # reorg-app:
+    # image: [should the dockerfile be on a registry or on disk?]
+    # container_name: reorg-app
+
