@@ -108,22 +108,25 @@ func (s *Server) PreviewHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	dummyFolders := make(map[string]*models.Folder, 0)
+	f := models.Folder{
+
+		TargetUUID: "target-uuid",
+		TargetName: "test-folder",
+		Files: []models.File{
+			{
+				FileUUID: "file-uuid",
+				FileName: "matched-file.pdf",
+			},
+		},
+	}
+
+	dummyFolders["target-uuid"] = &f
 
 	// Return dummy evaluation result for debugging
 	dummyResult := models.EvaluationResult{
 		UploadUUID: "upload-uuid",
-		Folders: []models.Folder{
-			{
-				TargetUUID: "target-uuid",
-				TargetName: "test-folder",
-				Files: []models.File{
-					{
-						FileUUID: "file-uuid",
-						FileName: "matched-file.pdf",
-					},
-				},
-			},
-		},
+		Folders:    dummyFolders,
 		Unmatched: models.UnmatchedFolder{
 			Name: "unmatched",
 			Files: []models.File{

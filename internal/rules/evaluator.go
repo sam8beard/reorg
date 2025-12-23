@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"errors"
 	"github.com/sam8beard/reorg/internal/models"
 	"log"
 	"slices"
@@ -12,20 +13,31 @@ type Target struct {
 	TargetName string
 }
 
-func Evaluate(ruleSet *models.RuleSet, fileMetadata map[string]models.FileMetadata) (*models.EvaluationResult, error) {
-	// Validate ruleset structure
-	if err := Validate(ruleSet); err != nil {
-		return nil, err
-	}
+type BestMatch map[string]Target
 
+type TargetMatches map[string]int
+
+func Evaluate(ruleSet *models.RuleSet, fileMetadata map[string]models.FileMetadata) (*models.EvaluationResult, error) {
 	// Debugging
 	log.Printf("RuleSet received:\n%+v\n\n", ruleSet)
 	log.Printf("FileMetadata received:\n%+v\n\n", fileMetadata)
+
+	// Validate ruleset structure
+	// NOTE: Im not even sure we need this, input is validated on the frontend
+	// May be good for redundancy's sake
+	if err := Validate(ruleSet); err != nil {
+		return nil, err
+	}
 
 	// Grab upload UUID, files, and targets from ruleset
 	uploadUUID := ruleSet.UploadUUID
 	files := ruleSet.Files
 	targets := ruleSet.Targets
+
+	// Debugging
+	log.Printf("Upload UUID: \n%s\n\n", uploadUUID)
+	log.Printf("Files list: \n%+v\n\n", files)
+	log.Printf("Targets list: \n%+v\n\n", targets)
 
 	// Initialize evaluation result object
 	evalResult := models.EvaluationResult{
@@ -37,146 +49,34 @@ func Evaluate(ruleSet *models.RuleSet, fileMetadata map[string]models.FileMetada
 		},
 	}
 
-	// Debugging
-	log.Printf("Upload UUID: \n%s\n\n", uploadUUID)
-	log.Printf("Files list: \n%+v\n\n", files)
-	log.Printf("Targets list: \n%+v\n\n", targets)
-
 	// Iterate through files
 	for fileUUID := range files {
 		// Retrieve metadata for current file using fileUUID
 		md := fileMetadata[fileUUID]
 
-		// Keep track of matching targets and how many conditions are matched
-		matchingTargets := make(map[string]int, 0)
+		// Target condition matches for current file
+		targetMatches := TargetMatches{}
 
-		// Check every target and its associated rule against current file
+		// Check every target and its associated rule against the current file
 		for _, target := range targets {
 
-			// Keep track of current target and its conditions matched
-			currTargetUUID := target.TargetUUID
-			matchingTargets[currTargetUUID] = 0
-
-			// Get rule associated with target
-			rule := target.Rule
-
-			// Get matching conditions and actions to execute upon match
-			conditions, _ := rule.Conditions, rule.Actions
-
-			/*
-				NOTE:
-
-				I just realized we are already keeping track of the folder to move files to
-				in the rule.Actions member.
-
-				Can we use this in any capacity? Or do we still need our current logic?
-			*/
-
-			if rule.ActiveConditions["extension"] && rule.ActiveConditions["mime_type"] {
-
-				/*
-				 * File type condition has been given by user
-				 */
-
-				matched := checkFileType(conditions, md)
-				if matched {
-					// Condition met, increment counter for target
-					matchingTargets[currTargetUUID]++
-				} else {
-					// Condition given and not met
-					// Disqualify current target and check next target
-					matchingTargets[currTargetUUID] = 0
-					continue
-				}
-			}
-
-			if rule.ActiveConditions["name_contains"] {
-
-				/*
-				 * Name contains condition has been given by user
-				 */
-
-				matched := checkNameContains(conditions, md)
-				if matched {
-					matchingTargets[currTargetUUID]++
-				} else {
-					matchingTargets[currTargetUUID] = 0
-					continue
-				}
-			}
-
-			if rule.ActiveConditions["size"] {
-
-				/*
-				 * Size condition has been given by user
-				 */
-
-				matched := checkSize(conditions, md)
-				if matched {
-					matchingTargets[currTargetUUID]++
-				} else {
-					matchingTargets[currTargetUUID] = 0
-					continue
-				}
-			}
-
-			if rule.ActiveConditions["created"] {
-
-				/*
-				 * Created condition has been given by user
-				 */
-
-				matched := checkCreated(conditions, md)
-				if matched {
-					matchingTargets[currTargetUUID]++
-				} else {
-					matchingTargets[currTargetUUID] = 0
-					continue
-				}
-			}
-
-		}
-
-		// Keep track of most specific and valid target and the greatest amount of conditions matched for any valid target
-		bestMatch := make(map[string]Target, 0)
-		var bestMatchUUID string
-		mostConditions := 0
-
-		// Decide which target receives the current file
-		// by iterating through matchingTargets and getting
-		// the number of conditions matched
-		for targetUUID, numMatched := range matchingTargets {
-			targetName := targets[targetUUID].TargetName
-			currentTarget := make(map[string]Target, 0)
-			currentTarget[targetUUID] = Target{
-				TargetUUID: targetUUID,
-				TargetName: targetName,
-			}
-
-			// If the current target's specificity is greater than the greatest we've seen so far
-			if numMatched > mostConditions {
-				// Change the greatest we've seen so far to the current target's specificity
-				mostConditions = numMatched
-
-				// Track this target
-				bestMatch[targetUUID] = currentTarget[targetUUID]
-				bestMatchUUID = targetUUID
-
-			} else if numMatched == mostConditions && (numMatched != 0 && mostConditions != 0) && (currentTarget[targetUUID] != bestMatch[targetUUID]) {
-				// NOTE: THIS LOGIC IS WRONG (I think?)
-				// NOTE: this case is pretty shakey, not really sure how to check for this case
-				// This is if there is a tie in the specificity of two targets
-				//
-				// What should be done?
-				// Create two folders and copy file to both? I don't think it will be this easy
-				// Create two folders if they dont
-
-				log.Println("firing")
+			// Get total matches for current target
+			if err := targetMatches.getMatches(target, md); err != nil {
+				// No matches found for current target
+				log.Printf("%v", err)
+				// Check next target
+				continue
 			}
 		}
 
-		// No matches were found for this file
-		if len(bestMatch) == 0 {
+		// Best matched target (greatest number of valid conditions)
+		bestMatch := BestMatch{}
+
+		// Get target to add file to
+		bestMatchUUID, err := bestMatch.selectTarget(targets, targetMatches)
+
+		// If this file does not match any target's rule
+		if err != nil {
 			unmatchedFile := models.File{
 				FileUUID: md.FileUUID,
 				FileName: md.FileName,
@@ -188,62 +88,202 @@ func Evaluate(ruleSet *models.RuleSet, fileMetadata map[string]models.FileMetada
 			continue
 		}
 
-		// Check if a folder corresponding to the best match target exists already
-		// If not, create new folder
-		if _, ok := evalResult.Folders[bestMatchUUID]; !ok {
-			// Create new folder
-			newFolder := models.Folder{
-				TargetUUID: bestMatchUUID,
-				TargetName: bestMatch[bestMatchUUID].TargetName,
-				Files:      make([]models.File, 0),
-			}
-			// Add folder to eval result
-			evalResult.Folders[bestMatchUUID] = &newFolder
-
-		}
-
-		// Create matched file to add the matching folder
-		matchedFile := models.File{
-			FileUUID: md.FileUUID,
-			FileName: md.FileName,
-		}
-
-		// Add file to corresponding folder
-		evalResult.Folders[bestMatchUUID].Files = append(evalResult.Folders[bestMatchUUID].Files, matchedFile)
-
+		// Bind file to folder in evaluation result
+		bestMatch.bindFile(&evalResult, bestMatchUUID, md)
 	}
 
 	// Return evaluation result
+	log.Printf("\nEvaluation Result:\n\n%+v", evalResult)
 	return &evalResult, nil
 }
+
+/*
+Gets the total number of conditions matched for a given target and file.
+Populates the calling object with the number of condition matches for a given target on success.
+
+In order for a target to be considered a possible candidate, all active conditions for a target
+must match for the given file.
+
+Returns an error if a the given file fails to match at least one condition for the given target.
+*/
+func (tm *TargetMatches) getMatches(target models.Target, md models.FileMetadata) error {
+
+	// Keep track of current target and its conditions matched
+	currTargetUUID := target.TargetUUID
+	(*tm)[currTargetUUID] = 0
+
+	// Get rule associated with target
+	rule := target.Rule
+
+	// Get matching conditions and actions to execute upon match
+	conditions, _ := rule.Conditions, rule.Actions
+
+	/*
+		NOTE:
+		I just realized we are already keeping track of the folder to move files to
+		in the rule.Actions member.
+		Can we use this in any capacity? Or do we still need our current logic?
+	*/
+
+	// Check conditions, if condition exists, check if there is a match
+	for condition, active := range rule.ActiveConditions {
+		switch condition {
+		case "mime_type":
+			if active {
+				if checkFileType(conditions, md) {
+					// Condition met, increment counter for target
+					(*tm)[currTargetUUID]++
+				} else {
+					// Condition given and not met
+					// Disqualify current target and check next target
+					(*tm)[currTargetUUID] = 0
+					return errors.New("failed match on file type")
+				}
+			}
+		case "name_contains":
+			if active {
+				if checkNameContains(conditions, md) {
+					// Condition met, increment counter for target
+					(*tm)[currTargetUUID]++
+				} else {
+					// Condition given and not met
+					// Disqualify current target and check next target
+					(*tm)[currTargetUUID] = 0
+					return errors.New("failed match on name contains")
+				}
+			}
+		case "size":
+			if active {
+				if checkSize(conditions, md) {
+					// Condition met, increment counter for target
+					(*tm)[currTargetUUID]++
+				} else {
+					// Condition given and not met
+					// Disqualify current target and check next target
+					(*tm)[currTargetUUID] = 0
+					return errors.New("failed match on size")
+				}
+			}
+		case "created":
+			if active {
+				if checkCreated(conditions, md) {
+					// Condition met, increment counter for target
+					(*tm)[currTargetUUID]++
+				} else {
+					// Condition given and not met
+					// Disqualify current target and check next target
+					(*tm)[currTargetUUID] = 0
+					return errors.New("failed match on date creation")
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+/*
+Selects the best fit target using the target with the greatest
+number of conditions matched.
+
+Returns an error if the file had no condition matches for any target
+*/
+func (bm *BestMatch) selectTarget(targets map[string]models.Target, targetMatches map[string]int) (string, error) {
+	// Keep track of most specific and valid target and the greatest amount of conditions matched for any valid target
+	var bestMatchUUID string
+	mostConditions := 0
+
+	// Iterate through target matches
+	for targetUUID, numMatched := range targetMatches {
+		// Get target name
+		targetName := targets[targetUUID].TargetName
+
+		// Create temp target
+		currentTarget := make(map[string]Target, 0)
+		currentTarget[targetUUID] = Target{
+			TargetUUID: targetUUID,
+			TargetName: targetName,
+		}
+
+		// If the current target's specificity is greater than the greatest we've seen so far
+		if numMatched > mostConditions {
+			// Change the greatest we've seen so far to the current target's specificity
+			mostConditions = numMatched
+
+			// Select this target as the best matched so far
+			(*bm)[targetUUID] = currentTarget[targetUUID]
+			bestMatchUUID = targetUUID
+
+		} else if numMatched == mostConditions && (numMatched != 0 && mostConditions != 0) && (currentTarget[targetUUID] != (*bm)[targetUUID]) {
+			// TODO: WE MUST PREVENT THIS CASE ON RULE CREATION IN THE FRONTEND!!!!!
+			//
+			// When a rule is created, check if any other target's rule has the EXACT
+			// same conditions
+			//
+			// If they do, notify the user and reject the rule creation
+
+			log.Println("firing")
+		}
+	}
+
+	// If there are no matches to any target's rule
+	if len((*bm)) == 0 {
+		return "", errors.New("no matches found")
+	}
+
+	return bestMatchUUID, nil
+
+}
+
+/* Binds a file to a folder in the evaluation result using the best fit target */
+func (bm *BestMatch) bindFile(evalResult *models.EvaluationResult, bestMatchUUID string, md models.FileMetadata) {
+	// Check if a folder corresponding to the best match target exists already
+	// If not, create new folder
+	if _, ok := evalResult.Folders[bestMatchUUID]; !ok {
+		// Create new folder
+		newFolder := models.Folder{
+			TargetUUID: bestMatchUUID,
+			TargetName: (*bm)[bestMatchUUID].TargetName,
+			Files:      make([]models.File, 0),
+		}
+		// Add folder to eval result
+		evalResult.Folders[bestMatchUUID] = &newFolder
+
+	}
+
+	// Create matched file to add the matching folder
+	matchedFile := models.File{
+		FileUUID: md.FileUUID,
+		FileName: md.FileName,
+	}
+
+	// Bind file to corresponding folder
+	evalResult.Folders[bestMatchUUID].Files = append(evalResult.Folders[bestMatchUUID].Files, matchedFile)
+}
+
+/* Checks if file type condition is met */
 func checkFileType(conditions models.Conditions, md models.FileMetadata) bool {
 
-	matches := false
-
+	// Mimetypes for target
 	_, mimeTypes := conditions.Extensions, conditions.MimeType
 
 	// NOTE: this logic is currently wrong, we need to check that EVERY mimetype given is
 	// present in md.MimeType, at least I think its wrong, need to see how .Contains works
-	if slices.Contains(mimeTypes, md.MimeType) {
-		matches = true
-	}
-	return matches
+	return slices.Contains(mimeTypes, md.MimeType)
 }
 
+/* Checks if name contains condition is met */
 func checkNameContains(conditions models.Conditions, md models.FileMetadata) bool {
 
-	matches := false
-
+	// Current file name and substring to match
 	fileName, nameToMatch := md.FileName, conditions.NameContains
 
 	// If the substring specified is in the file name
-	if strings.Contains(fileName, nameToMatch) {
-		matches = true
-	}
+	return strings.Contains(fileName, nameToMatch)
 
-	return matches
 }
 
+/* Checks if size condition is met */
 func checkSize(conditions models.Conditions, md models.FileMetadata) bool {
 
 	matches := false
@@ -310,6 +350,7 @@ func checkSize(conditions models.Conditions, md models.FileMetadata) bool {
 	return matches
 }
 
+/* Checks if date creation condition is met */
 func checkCreated(conditions models.Conditions, md models.FileMetadata) bool {
 
 	matches := false

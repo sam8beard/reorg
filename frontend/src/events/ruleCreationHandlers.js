@@ -1,6 +1,7 @@
 import { store } from '../state.js';
 import { postRuleJson, getPreviewJson } from '../api';
 import { showPreview } from '../navigation.js';
+import _ from 'lodash';
 
 export async function onRuleSubmit(event, root) { 
 	event.preventDefault();
@@ -127,6 +128,7 @@ function buildRuleFromForm(formData) {
 	let unitProvided = false;
 
 	const ruleJson = { 
+		"uploadUUID": store.upload.uploadUUID,
 		"ruleUUID": crypto.randomUUID(),
 		"ruleName": null,
 		"activeConditions": {
@@ -278,7 +280,7 @@ function buildRuleFromForm(formData) {
 	if (!nameProvided) { 
 		throw new Error('Rule name must be provided');
 	}
-
+	
 	// If invalid file size input provided
 	const anySizeField = sizeProvided || comparatorProvided || unitProvided;
 	const allSizeField = sizeProvided && comparatorProvided && unitProvided;
@@ -295,10 +297,42 @@ function buildRuleFromForm(formData) {
 		throw new Error(`Please provide at least one condition for ${ruleJson.ruleName}`);
 	}
 
+	// If every condition in the submitted rule is already associated with a rule from the current upload
+	if (isDuplicate(ruleJson)) {
+		throw new Error(`This rule is already associated with another folder for this upload.`);
+	}
+
 	console.log(ruleJson);
 	for (const key in ruleJson) { 
 		console.log("Type of " + key + ": " + typeof(ruleJson[key]));
 	}
 	return ruleJson;
+}
 
+function isDuplicate(ruleJson) {
+	// TODO: also check on folder name associated with rule
+	// NOTE: will not allow duplicate folder names, but will allow 
+	// 	 duplicate rule names AS LONG AS they are associated with different folders
+	//
+	//	This must be handled on folder creation.
+	//
+	//
+	// Current rule conditions
+	const newRuleConditions = ruleJson.when;
+	// Upload UUID associated with rule
+	const newRuleUploadUUID = ruleJson.uploadUUID;
+
+	// Iterate through all rules
+	for (let rule of store.rules) {
+
+		let ruleUploadUUID = rule.uploadUUID;
+		let ruleConditions = rule.when;
+		
+		// Rule is associated with the same upload
+		if (newRuleUploadUUID === ruleUploadUUID) {
+			// Conditions are deeply equal
+			if (_.isEqual(newRuleConditions, ruleConditions)) return true;
+		}
+	}
+	return false;
 }
