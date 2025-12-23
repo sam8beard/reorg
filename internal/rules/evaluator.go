@@ -5,6 +5,7 @@ import (
 	"log"
 	"slices"
 	"strings"
+	"time"
 )
 
 type Target struct {
@@ -299,9 +300,7 @@ func checkSize(conditions models.Conditions, md models.FileMetadata) bool {
 		adjustedSize = float64(valueChoice) * GBConv
 	}
 
-	// Build expression
-
-	// Compare adjusted file size against given value choice
+	// Get result using comparator, adjusted file size, and value choice
 	switch compSelected {
 	case Greater:
 		matches = float64(fileSize) > adjustedSize
@@ -315,5 +314,49 @@ func checkSize(conditions models.Conditions, md models.FileMetadata) bool {
 func checkCreated(conditions models.Conditions, md models.FileMetadata) bool {
 
 	matches := false
+
+	// Creation date of file in miliseconds
+	creationDate := md.OGTimestamp.UnixMilli()
+
+	// Get data boundary options (default value is nil if omitted)
+	beforeDate, afterDate := conditions.Created.Before, conditions.Created.After
+
+	// Check if both a before date and after date were specified
+	rangedBoundary := false
+	if beforeDate != 0 && afterDate != 0 {
+		rangedBoundary = true
+	}
+
+	// Evaluate based on range or single bound
+	switch rangedBoundary {
+
+	// Range evaluation
+	case true:
+	// Single bound evaluation
+	case false:
+
+		// Comparator choices for single bounded option
+		type Comparator int
+		const (
+			Greater Comparator = iota
+			Less
+		)
+		// Get comparator option selected (greater than or less than)
+		var compSelected Comparator
+		if beforeDate != 0 {
+			compSelected = Less
+		} else {
+			compSelected = Greater
+		}
+
+		// Evaluate based on comparator
+		switch compSelected {
+		case Less:
+			matches = 
+		case Greater:
+		}
+
+	}
+
 	return matches
 }
