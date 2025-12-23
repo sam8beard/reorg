@@ -1,9 +1,9 @@
 package models
 
 type EvaluationResult struct {
-	UploadUUID string          `json:"uploadUUID"`
-	Folders    []Folder        `json:"folders"`
-	Unmatched  UnmatchedFolder `json:"unmatched"`
+	UploadUUID string             `json:"uploadUUID"`
+	Folders    map[string]*Folder `json:"folders"`
+	Unmatched  UnmatchedFolder    `json:"unmatched"`
 }
 
 type Folder struct {
