@@ -93,8 +93,30 @@ func Evaluate(ruleSet *models.RuleSet, fileMetadata map[string]models.FileMetada
 	}
 
 	// Return evaluation result
-	log.Printf("\nEvaluation Result:\n\n%+v", evalResult)
+	logEvalResult(&evalResult)
 	return &evalResult, nil
+}
+
+/*
+Logs an evaluation result
+*/
+func logEvalResult(er *models.EvaluationResult) {
+	folders := er.Folders
+	for _, folder := range folders {
+		folderName := folder.TargetName
+		files := folder.Files
+		log.Printf("Folder Name: %s\n", folderName)
+		for _, file := range files {
+			log.Printf("%s File Info:\n%+v", folderName, file)
+		}
+
+	}
+
+	unmatched := er.Unmatched
+	log.Print("Unmatched Folder Files:\n\n")
+	for _, file := range unmatched.Files {
+		log.Printf("\nFile Info:\n%+v", file)
+	}
 }
 
 /*
@@ -130,7 +152,9 @@ func (tm *TargetMatches) getMatches(target models.Target, md models.FileMetadata
 		switch condition {
 		case "mime_type":
 			if active {
+				log.Println("condition detected")
 				if checkFileType(conditions, md) {
+					log.Println("match on file type")
 					// Condition met, increment counter for target
 					(*tm)[currTargetUUID]++
 				} else {
@@ -142,7 +166,9 @@ func (tm *TargetMatches) getMatches(target models.Target, md models.FileMetadata
 			}
 		case "name_contains":
 			if active {
+				log.Println("condition detected")
 				if checkNameContains(conditions, md) {
+					log.Println("match on name contains")
 					// Condition met, increment counter for target
 					(*tm)[currTargetUUID]++
 				} else {
@@ -154,7 +180,9 @@ func (tm *TargetMatches) getMatches(target models.Target, md models.FileMetadata
 			}
 		case "size":
 			if active {
+				log.Println("condition detected")
 				if checkSize(conditions, md) {
+					log.Println("match on size")
 					// Condition met, increment counter for target
 					(*tm)[currTargetUUID]++
 				} else {
@@ -166,7 +194,9 @@ func (tm *TargetMatches) getMatches(target models.Target, md models.FileMetadata
 			}
 		case "created":
 			if active {
+				log.Println("condition detected")
 				if checkCreated(conditions, md) {
+					log.Println("match on created")
 					// Condition met, increment counter for target
 					(*tm)[currTargetUUID]++
 				} else {

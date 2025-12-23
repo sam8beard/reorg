@@ -26,6 +26,7 @@ const initialState = {
 	// UI state
 	activeTarget: null,
 	activeRule: null,
+	preview: null,
 
 	resultZipURL: null,
 	loginError: null,

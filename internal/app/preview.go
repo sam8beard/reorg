@@ -97,7 +97,7 @@ func (s *Server) PreviewHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get evaluation result
-	_, err = rules.Evaluate(&ruleSet, fileMetadata)
+	evalResult, err := rules.Evaluate(&ruleSet, fileMetadata)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
@@ -108,50 +108,50 @@ func (s *Server) PreviewHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	dummyFolders := make(map[string]*models.Folder, 0)
-	f := models.Folder{
+	//dummyFolders := make(map[string]*models.Folder, 0)
+	//f := models.Folder{
 
-		TargetUUID: "target-uuid",
-		TargetName: "test-folder",
-		Files: []models.File{
-			{
-				FileUUID: "file-uuid",
-				FileName: "matched-file.pdf",
-			},
-		},
-	}
+	//	TargetUUID: "target-uuid",
+	//	TargetName: "test-folder",
+	//	Files: []models.File{
+	//		{
+	//			FileUUID: "file-uuid",
+	//			FileName: "matched-file.pdf",
+	//		},
+	//	},
+	//}
 
-	dummyFolders["target-uuid"] = &f
+	//dummyFolders["target-uuid"] = &f
 
-	// Return dummy evaluation result for debugging
-	dummyResult := models.EvaluationResult{
-		UploadUUID: "upload-uuid",
-		Folders:    dummyFolders,
-		Unmatched: models.UnmatchedFolder{
-			Name: "unmatched",
-			Files: []models.File{
-				{
-					FileUUID: "unmatched-file-uuid",
-					FileName: "unmatched-file.png",
-				},
-			},
-		},
-	}
+	//// Return dummy evaluation result for debugging
+	//dummyResult := models.EvaluationResult{
+	//	UploadUUID: "upload-uuid",
+	//	Folders:    dummyFolders,
+	//	Unmatched: models.UnmatchedFolder{
+	//		Name: "unmatched",
+	//		Files: []models.File{
+	//			{
+	//				FileUUID: "unmatched-file-uuid",
+	//				FileName: "unmatched-file.png",
+	//			},
+	//		},
+	//	},
+	//}
 
-	// Return dummy result for debugging
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(dummyResult); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	//// Return evaluation result
+	//// Return dummy result for debugging
 	//w.Header().Set("Content-Type", "application/json")
 	//w.WriteHeader(http.StatusOK)
-	//if err := json.NewEncoder(w).Encode(evalResult); err != nil {
+	//if err := json.NewEncoder(w).Encode(dummyResult); err != nil {
 	//	http.Error(w, err.Error(), http.StatusInternalServerError)
 	//	return
 	//}
+
+	// Return evaluation result
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(evalResult); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 }
