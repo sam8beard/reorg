@@ -5,7 +5,6 @@ import (
 	"log"
 	"slices"
 	"strings"
-	"time"
 )
 
 type Target struct {
@@ -322,16 +321,15 @@ func checkCreated(conditions models.Conditions, md models.FileMetadata) bool {
 	beforeDate, afterDate := conditions.Created.Before, conditions.Created.After
 
 	// Check if both a before date and after date were specified
-	rangedBoundary := false
-	if beforeDate != 0 && afterDate != 0 {
-		rangedBoundary = true
-	}
+	rangedBoundary := beforeDate != 0 && afterDate != 0
 
 	// Evaluate based on range or single bound
 	switch rangedBoundary {
 
 	// Range evaluation
 	case true:
+		matches = (creationDate < beforeDate) && (creationDate > afterDate)
+
 	// Single bound evaluation
 	case false:
 
@@ -352,10 +350,10 @@ func checkCreated(conditions models.Conditions, md models.FileMetadata) bool {
 		// Evaluate based on comparator
 		switch compSelected {
 		case Less:
-			matches = 
+			matches = creationDate < beforeDate
 		case Greater:
+			matches = creationDate > afterDate
 		}
-
 	}
 
 	return matches
