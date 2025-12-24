@@ -53,9 +53,7 @@ export async function onRuleSubmit(event, root) {
 function buildRuleSet() {
 	const ruleSet = {
 		"uploadUUID": store.upload.uploadUUID,
-		//"files": store.upload.files,
 		"files": {},
-		//"targets": []
 		"targets": {}
 	};
 	
@@ -172,7 +170,7 @@ function buildRuleFromForm(formData) {
 		switch(key) { 
 			// handles the rule building for file type matching
 			case 'ruleName':
-				if (val !== '') { 
+				if (val.trim() !== '') { 
 					nameProvided = true;
 					ruleJson.ruleName = val.trim();
 				}
