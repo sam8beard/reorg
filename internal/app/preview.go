@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Server) PreviewHandler(w http.ResponseWriter, r *http.Request) {
-	// Close request body
+	// Defer close on request body
 	defer func() {
 		if closeErr := r.Body.Close(); closeErr != nil {
 			log.Fatalf("could not close request body: %v", closeErr)

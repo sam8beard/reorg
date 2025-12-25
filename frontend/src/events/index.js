@@ -3,3 +3,4 @@ export * from './signupHandlers.js';
 export * from './uploadHandlers.js';
 export * from './organizeHandlers.js';
 export * from './ruleCreationHandlers.js';
+export * from './downloadHandlers.js';

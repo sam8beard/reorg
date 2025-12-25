@@ -2,11 +2,16 @@ import axios from 'axios';
 const DEV_API_BASE = "http://localhost:5173/api";
 
 /* Post file data to backend */
-export async function uploadFileForm(formData) { 
+export async function uploadFileForm(formData, progressBar) { 
 	const uploadURL = DEV_API_BASE + "/upload";
 	try { 
 		console.log(formData);
-		const response = await axios.post(uploadURL, formData);
+		const response = await axios.post(uploadURL, formData, {
+			onUploadProgress: (progEvent) => {
+				const percent = Math.round((progEvent.loaded * 100) / progEvent.total);
+				progressBar.style.width = percent + '%';
+			}
+		});
 		return response.data;
 
 	} catch (err) { 

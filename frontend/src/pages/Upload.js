@@ -11,11 +11,11 @@ export default function Upload(root, userData) {
 	const username = (user) ? store.user.userID.username : "Guest";
 	root.innerHTML = `
 		<div id='upload-root'>
-			<h1 style='margin: 4em;' id='upload-banner'>
-				${username}
-			</h1>
+			<div style='margin-bottom: 5em;' id='upload-banner'>
+				<h1> ${username} </h1>
+			</div>
 
-			<div  id='upload-form-container'>
+			<div  style='margin: 1em;' id='upload-form-container'>
 				<!-- Need to decide what user data we're maintaining in database if using with an account 
 				
 				link to resource: https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications'
@@ -36,9 +36,9 @@ export default function Upload(root, userData) {
 						</label>
 					</div>
 
-					<div>
+					<div style='display: flex; justify-content: center; gap: 1em;'>
 						<button style='margin-top: 6em;' id='upload-btn' type='submit'>Upload</button>
-						<button style='display:none; margin-top: 6em;' id='organize-page-btn' type='button' disabled='true'>Organize</button>
+						<button style='display:none;' id='organize-page-btn' type='button' disabled='true'>Organize Files</button>
 					</div>
 
 				</form> 
@@ -47,7 +47,17 @@ export default function Upload(root, userData) {
 				Here is where we will display the preview for all files 
 				uploaded so far
 				-->
-				<ul id='file-preview' style='list-style-type: none;'></ul>
+				<div id='status-container'>
+					<div id='status-msg'></div>
+				</div>
+				<div style='display: flex; justify-content: center; margin: 1em'>
+					<div id='progress-bar-container'>
+						<div id='upload-progress-bar'>
+						</div>
+					</div>
+				</div>
+				<div id='upload-preview'>
+				</div>
 
 			</div>
 		</div>
@@ -68,7 +78,7 @@ export default function Upload(root, userData) {
 
 	// Here, we'll deal with the behavior of dropping files for the drop target
 	const dropZone = root.querySelector("#drop-zone");
-	const preview = root.querySelector("#file-preview");
+	const preview = root.querySelector("#upload-preview");
 	const uploadForm = root.querySelector("#upload-form");
 	
 	// Make sure dropHandler handles multi-file uploads

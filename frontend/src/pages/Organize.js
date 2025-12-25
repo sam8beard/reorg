@@ -15,20 +15,18 @@ export default function Organize(root, userData) {
 				</button>
 			</div>
 			<div id='organize-file-preview-container'>
-				<h2> Uploaded Files </h2>
 				<!-- Fetch all files with the correct upload id and display here -->	
-				<ul id='file-list' style='list-style-type: none;'></ul>
 			</div>
 		</div>
 	`;
 
 	// Display preview of uploaded files
-	const fileList = root.querySelector('#file-list');
-	for (const file of store.upload.files) { 
-		const li = document.createElement("li");
-		li.appendChild(document.createTextNode(file.fileName));
-		fileList.appendChild(li);
-	}
+	//const fileList = root.querySelector('#file-list');
+	//for (const file of store.upload.files) { 
+	//	const li = document.createElement("li");
+	//	li.appendChild(document.createTextNode(file.fileName));
+	//	fileList.appendChild(li);
+	//}
 
 	// Attach event handlers for organize option buttons
 	const orgAIBtn = root.querySelector('#ai-organize-btn');

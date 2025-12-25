@@ -4,6 +4,7 @@
 import { uploadFileForm } from '../api';
 import { showUpload } from '../navigation.js';
 import { store } from '../state.js';
+import { Tree, Folder, File } from 'https://cdn.jsdelivr.net/npm/@webreflection/file-tree/prod.js';
 /*
  * Adds event for guest button click on landing page.
  *
@@ -55,7 +56,7 @@ async function scanFiles(entry, dt) {
 /*
  * Handle uploaded files via drop
  */
-export async function dropHandler(e, root, preview) { 
+export async function dropHandler(e, root, previewContainer) { 
 	const items = e.dataTransfer.items;
 	e.preventDefault();
 	const dt = new DataTransfer();
@@ -80,26 +81,26 @@ export async function dropHandler(e, root, preview) {
 	input.files = dt.files;
 	console.log("DEBUG: ", dt.files);
 	console.log("Files: ", input.files);
-	displayFiles(dt.files, preview)
+	displayFiles(dt.files, previewContainer)
 }
 
 /*
  * Handle uploaded files via default input
  */
-export async function fileInputHandler(e, preview) {
-	displayFiles(e.target.files, preview);
+export async function fileInputHandler(e, previewContainer) {
+	displayFiles(e.target.files, previewContainer);
 }
 
 /*
  * Display preview for files uploaded
  */
-function displayFiles(files, preview) {
-	preview.innerText = "";
-	for (const file of files) {
-		const li = document.createElement("li");
-		li.appendChild(document.createTextNode(file.name));
-		preview.appendChild(li);
+function displayFiles(files, previewContainer) {
+	const tree = new Tree;
+	
+	for (const file of files) { 
+		tree.append(new File([], file.name));
 	}
+	previewContainer.appendChild(tree);
 } 
 
 /*
@@ -126,24 +127,46 @@ export async function onFileSubmit(e, root) {
 	for (const file of files) {
 		formData.append(file.name, file, file.lastModified); 
 	}
-
-	// Upload files
-	const response = await uploadFileForm(formData);
-
-	// Alter frontend state
+	
+	// Get DOM elements to update
+	const progressBar = root.querySelector("#upload-progress-bar");
+	const progressBarContainer = root.querySelector("#progress-bar-container");
 	const preview = root.querySelector("#file-preview");
+	const previewContainer = root.querySelector('#upload-preview');
 	const uploadBtn = root.querySelector("#upload-btn");
 	const organizeBtn = root.querySelector("#organize-page-btn");
+	const statusMessage = root.querySelector('#status-container');
+
+	// Upload files
+	statusMessage.innerHTML = `
+		<h3>Uploading files...</h3>
+	`;
+	
+	progressBarContainer.style = 'width: 20em; background: white; height: 2em; border-radius: 4px;';
+	progressBar.style.height = '100%';
+	progressBar.style.width = '0%';
+	progressBar.style.background = '#409940';
+	progressBar.style.borderRadius = '4px';
+
+	const response = await uploadFileForm(formData, progressBar);
+
 	// Clear preview and replace with message on submission
 	if (response.error) { 
-		preview.innerText = "Failed to upload files";
+		statusMessage.innerHTML = `
+			<h3>Failed to upload files. Please try again.</h3>	
+		`;
+		progressBar.style.width = '0%';
+		previewContainer.style.display = 'none';
 		form.reset();
 	} else {
-		preview.innerText = "Files uploaded";
+		previewContainer.style.display = 'none';
+		statusMessage.innerHTML = `
+			<h3> Upload complete </h3>
+		`;
 		root.querySelector('#drop-zone').style.display = 'none';
 		uploadBtn.style.display = 'none';
 		uploadBtn.disabled = true;
-		organizeBtn.style.display = 'block';
+		organizeBtn.style = 'display: block;';
 		organizeBtn.disabled = false;
 
 		// Use upload ID returned from backend response
