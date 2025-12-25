@@ -93,14 +93,14 @@ func Evaluate(ruleSet *models.RuleSet, fileMetadata map[string]models.FileMetada
 	}
 
 	// Return evaluation result
-	logEvalResult(&evalResult)
+	LogEvalResult(&evalResult)
 	return &evalResult, nil
 }
 
 /*
 Logs an evaluation result
 */
-func logEvalResult(er *models.EvaluationResult) {
+func LogEvalResult(er *models.EvaluationResult) {
 	folders := er.Folders
 	for _, folder := range folders {
 		folderName := folder.TargetName

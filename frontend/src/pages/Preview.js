@@ -1,5 +1,7 @@
 import { store } from '../state.js';
 import { showOrganize } from '../navigation.js';
+import { downloadZip } from '../api';
+import { onDownloadClick } from '../events';
 import { Tree, Folder, File } from 'https://cdn.jsdelivr.net/npm/@webreflection/file-tree/prod.js';
 
 export default function Preview(root, user) { 
@@ -21,8 +23,9 @@ export default function Preview(root, user) {
 	const addFolderBtn = root.querySelector('#add-folder-btn');
 	addFolderBtn.addEventListener('click', () => showOrganize());
 
+
 	const downloadFilesBtn = root.querySelector('#download-zip-btn');
-	// downloadFilesBtn.addEventListener('click', () => down
+	downloadFilesBtn.addEventListener('click', () => onDownloadClick(store.preview));
 
 	const previewContainer = root.querySelector('#tree-container');
 	displayPreview(previewContainer, store.preview);
