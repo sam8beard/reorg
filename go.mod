@@ -7,6 +7,13 @@ require (
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/joho/godotenv v1.5.1
 	github.com/minio/minio-go/v7 v7.0.97
+	github.com/schollz/progressbar/v3 v3.18.0
+)
+
+require (
+	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
+	github.com/rivo/uniseg v0.4.7 // indirect
+	golang.org/x/term v0.31.0 // indirect
 )
 
 require (
