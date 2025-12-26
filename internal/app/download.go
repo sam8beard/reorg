@@ -2,7 +2,6 @@ package app
 
 import (
 	"archive/zip"
-	"bytes"
 	"context"
 	"encoding/json"
 	"github.com/minio/minio-go/v7"
@@ -12,7 +11,6 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
-	"strconv"
 )
 
 func (s *Server) DownloadZipHandler(w http.ResponseWriter, r *http.Request) {
@@ -84,9 +82,12 @@ func (s *Server) DownloadZipHandler(w http.ResponseWriter, r *http.Request) {
 		Recursive:    true,
 	}
 
+	// Set headers for downloadable zip archive
+	w.Header().Set("Content-Type", "application/zip")
+	w.Header().Set("Content-Disposition", `attachment; filename="organized_files.zip"`)
+
 	// Zip writer
-	var buf bytes.Buffer
-	zipWriter := zip.NewWriter(&buf)
+	zipWriter := zip.NewWriter(w)
 
 	// List all objects for this upload
 	for obj := range s.Minio.ListObjects(
@@ -179,15 +180,5 @@ func (s *Server) DownloadZipHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
-	// Set headers for downloadable zip archive
-	w.Header().Set("Content-Type", "application/zip")
-	w.Header().Set("Content-Disposition", `attachment; filename="organized_files.zip"`)
-	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
 
-	_, err = w.Write(buf.Bytes())
-	if err != nil {
-		log.Fatalf("%v", err)
-	}
-
-	//_ = zipWriter.Flush()
 }

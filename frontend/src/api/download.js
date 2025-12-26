@@ -8,7 +8,12 @@ export async function downloadZip(organizeResult) {
 	try {
 		// Might have to end up sending eval result with get request, serving zip file from the backend, and then downlaod from the frontend
 		console.log("firing");
-		const response = await axios.post(downloadURL, organizeResult, { responseType: 'blob' });
+		const response = await axios.post(downloadURL, organizeResult, { 
+			responseType: 'blob',
+			onDownloadProgress: (progEvent) => {
+					
+			}
+		});
 		return response.data;
 	} catch(err) { 
 		if (err.response) {
