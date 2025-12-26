@@ -95,12 +95,20 @@ func (s *Server) DownloadZipHandler(w http.ResponseWriter, r *http.Request) {
 		opts,
 	) {
 
+		log.Printf("%+v", obj)
+
 		// Object key
 		key := obj.Key
+
+		// Debugging
+		log.Println(key)
+
 		// File name
-		fileName := obj.UserMetadata["original-file-name"]
+		fileName := obj.UserMetadata["X-Amz-Meta-Original-File-Name"]
+
 		// File UUID
-		fileUUID := obj.UserMetadata["file-uuid"]
+		fileUUID := obj.UserMetadata["X-Amz-Meta-File-Uuid"]
+
 		// Get target UUID that we mapped to this file
 		targetUUID := fileMap[fileUUID]
 		// Get folder name that we mapped to this target UUID
@@ -128,6 +136,13 @@ func (s *Server) DownloadZipHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Create entry in archive
 		filePath := filepath.Join(folderName, fileName)
+
+		// Debuggin
+		log.Printf("Folder name: %s", folderName)
+		log.Printf("File name: %s", fileName)
+		log.Printf("File path: %s", filePath)
+
+		// Create file in zip archive
 		entry, err := zipWriter.Create(filePath)
 		if err != nil {
 			log.Fatalf("%v", err)
@@ -148,7 +163,11 @@ func (s *Server) DownloadZipHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatalf("%v", err)
 		}
-		fileBody.Close()
+
+		// Close file body
+		if err := fileBody.Close(); err != nil {
+			log.Fatalf("%v", err)
+		}
 
 	}
 
@@ -164,6 +183,7 @@ func (s *Server) DownloadZipHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/zip")
 	w.Header().Set("Content-Disposition", `attachment; filename="organized_files.zip"`)
 	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
+
 	_, err = w.Write(buf.Bytes())
 	if err != nil {
 		log.Fatalf("%v", err)
