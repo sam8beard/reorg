@@ -12,8 +12,9 @@ export default function Preview(root, user) {
 				<button id='add-folder-btn'>Make another folder</button>
 				<button id='download-zip-btn'>Download your organized files</button>
 			</div>
-			<div id='download-status-container'></div>
-			<div>
+			<div id='download-status-container' style='height: 2em; margin: 1em auto; display: flex; align-items: center; justify-content: center;'></div>
+
+			<div style='margin: 1em;'>
 				<h2>How your files will be organized</h2>
 			</div>
 			<div id='tree-container'>
@@ -26,8 +27,8 @@ export default function Preview(root, user) {
 
 
 	const downloadFilesBtn = root.querySelector('#download-zip-btn');
-	const downloadStatus = root.querySelector('#download-status-container');
-	downloadFilesBtn.addEventListener('click', (e) => onDownloadClick(e, downloadStatus, store.preview));
+	const downloadStatusContainer = root.querySelector('#download-status-container');
+	downloadFilesBtn.addEventListener('click', (e) => onDownloadClick(e, downloadStatusContainer, store.preview));
 
 	const previewContainer = root.querySelector('#tree-container');
 	displayPreview(previewContainer, store.preview);

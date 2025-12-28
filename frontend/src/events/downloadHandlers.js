@@ -1,13 +1,38 @@
 import { downloadZip } from '../api';
 import { Spinner } from 'spin.js';
 
+const spinnerOpts = {
+	lines: 10, // The number of lines to draw
+	length: 6, // The length of each line
+	width: 3, // The line thickness
+	radius: 6, // The radius of the inner circle
+	scale: 1, // Scales overall size of the spinner
+	corners: 1, // Corner roundness (0..1)
+	speed: 1, // Rounds per second
+	rotate: 0, // The rotation offset
+	animation: 'spinner-line-fade-quick', // The CSS animation name for the lines
+	direction: 1, // 1: clockwise, -1: counterclockwise
+	color: '#ffffff', // CSS color or array of colors
+	fadeColor: 'transparent', // CSS color or array of colors
+	shadow: '0 0 1px transparent', // Box-shadow for the lines
+	zIndex: 2000000000, // The z-index (defaults to 2e9)
+	className: 'spinner', // The CSS class to assign to the spinner
+	position: 'absolute'
+};
+
 export async function onDownloadClick(e, container, fileStructure) { 
-	const spinner = new Spinner().spin();
-	e.currentTarget.disabled = true;
+	const button = e.currentTarget;
+	container.innerHTML = '';
+	const spinner = new Spinner(spinnerOpts).spin(container);
+	button.disabled = true;
+	button.innerText = 'Downloading your organized files...';
+	let success = false;
 	try {
 		const blob = await downloadZip(fileStructure);
-		container.appendChild(spinner.el);
-
+		// If server does not return blob representing zip archive
+		//if (!(blob instanceof Blob)) {
+		//	throw new Error('Invalid download response');
+		//}
 		console.log(blob);
 		
 		const href = window.URL.createObjectURL(blob);
@@ -23,9 +48,32 @@ export async function onDownloadClick(e, container, fileStructure) {
 
 		document.body.removeChild(anch);
 		window.URL.revokeObjectURL(href);
-		spinner.stop();
+		success = true;
 
 	} catch (err) {
+		spinner.stop();
+		const cntr = document.querySelector('#download-status-container');
+		cntr.innerHTML = `
+			<p> Failed to download organized files. Please try again. </p>
+		`;
+		const btn = document.querySelector('#download-zip-btn');
+		btn.innerText = 'Download your organized files';
+		btn.disabled = false;
+
+		// Indicate unsuccessful download
+		success = false;
 		console.log(err);
+	}	
+	
+	// If zip was successfully downloaded
+	if (success) {
+		spinner.stop();
+		const cntr = document.querySelector('#download-status-container');
+		cntr.innerHTML = `
+			<p> Organized files downloaded as organized_files.zip </p>
+		`;
+		const btn = document.querySelector('#download-zip-btn');
+		btn.innerText = 'Download your organized files';
+		btn.disabled = false;
 	}
 }

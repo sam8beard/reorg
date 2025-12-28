@@ -7,9 +7,6 @@ export async function downloadZip(organizeResult) {
 	try {
 		const response = await axios.post(downloadURL, organizeResult, { 
 			responseType: 'blob',
-			onDownloadProgress: (progEvent) => {
-					
-			}
 		});
 		return response.data;
 	} catch(err) { 

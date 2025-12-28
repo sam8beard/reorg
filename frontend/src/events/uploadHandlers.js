@@ -138,6 +138,7 @@ export async function onFileSubmit(e, root) {
 	const statusMessage = root.querySelector('#status-container');
 
 	// Upload files
+	uploadBtn.disabled = true;
 	statusMessage.innerHTML = `
 		<h3>Uploading files...</h3>
 	`;

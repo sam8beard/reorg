@@ -1,4 +1,5 @@
 import './style.css';
+import 'spin.js/spin.css';
 import App from './App';
 
 /*
