@@ -3,11 +3,8 @@ const DEV_API_BASE = "http://localhost:5173/api";
 
 /* Downloads zip file of organized file structure */
 export async function downloadZip(organizeResult) {
-	console.log("firing");
 	const downloadURL = DEV_API_BASE + "/download/zip";
 	try {
-		// Might have to end up sending eval result with get request, serving zip file from the backend, and then downlaod from the frontend
-		console.log("firing");
 		const response = await axios.post(downloadURL, organizeResult, { 
 			responseType: 'blob',
 			onDownloadProgress: (progEvent) => {

@@ -2,16 +2,17 @@ import { store } from '../state.js';
 import { showOrganize } from '../navigation.js';
 import { downloadZip } from '../api';
 import { onDownloadClick } from '../events';
+import { Spinner } from 'spin.js';
 import { Tree, Folder, File } from 'https://cdn.jsdelivr.net/npm/@webreflection/file-tree/prod.js';
 
 export default function Preview(root, user) { 
-	console.log(store.preview);
 	root.innerHTML = `
 		<div id='preview-root'>	
 			<div id='preview-options'>
 				<button id='add-folder-btn'>Make another folder</button>
 				<button id='download-zip-btn'>Download your organized files</button>
 			</div>
+			<div id='download-status-container'></div>
 			<div>
 				<h2>How your files will be organized</h2>
 			</div>
@@ -25,7 +26,8 @@ export default function Preview(root, user) {
 
 
 	const downloadFilesBtn = root.querySelector('#download-zip-btn');
-	downloadFilesBtn.addEventListener('click', () => onDownloadClick(store.preview));
+	const downloadStatus = root.querySelector('#download-status-container');
+	downloadFilesBtn.addEventListener('click', (e) => onDownloadClick(e, downloadStatus, store.preview));
 
 	const previewContainer = root.querySelector('#tree-container');
 	displayPreview(previewContainer, store.preview);
