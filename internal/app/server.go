@@ -5,6 +5,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 	"github.com/minio/minio-go/v7"
+	"github.com/sam8beard/reorg/internal/auth"
 	"log"
 	"net/http"
 	"os"
@@ -16,6 +17,7 @@ type Server struct {
 	DB          *pgxpool.Pool
 	Minio       *minio.Client
 	MinioBucket string
+	JWTService  *auth.JWTService
 }
 
 /*
@@ -28,7 +30,7 @@ type SpaHandler struct {
 	indexPath  string
 }
 
-func NewServer(db *pgxpool.Pool, minio *minio.Client) *Server {
+func NewServer(jwtService *auth.JWTService, db *pgxpool.Pool, minio *minio.Client) *Server {
 
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("could not load env vars: %v", err)
@@ -38,6 +40,7 @@ func NewServer(db *pgxpool.Pool, minio *minio.Client) *Server {
 		DB:          db,
 		Minio:       minio,
 		MinioBucket: os.Getenv("MINIO_BUCKET_NAME"),
+		JWTService:  jwtService,
 	}
 }
 

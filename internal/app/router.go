@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/sam8beard/reorg/internal/auth/middleware"
 )
 
 /*
@@ -17,35 +18,39 @@ func (s *Server) BuildRouterDev() *mux.Router {
 	// Health check
 	r.HandleFunc("/health", s.HealthHandler).Methods("GET")
 
-	// Sign up
-	//r.HandleFunc("/auth/signup", s.SignupHandler).Methods("POST")
-
-	// Log in
+	// Public routes
+	r.HandleFunc("/auth/signup", s.SignupHandler).Methods("POST")
 	//r.HandleFunc("/auth/login", s.LoginHandler).Methods("POST")
+	r.HandleFunc("/auth/guest", s.GuestHandler).Methods("POST")
+
+	// Auth protected routes
+	authMiddleware := middleware.AuthMiddleware(s.JWTService)
+	protected := r.NewRoute().Subrouter()
+	protected.Use(authMiddleware)
 
 	// Get user data
-	r.HandleFunc("/user", s.UserHandler).Methods("POST")
+	//protected.HandleFunc("/user", s.UserHandler).Methods("POST")
 
 	// Receive file uploads
-	r.HandleFunc("/upload", s.UploadHandler).Methods("POST")
+	protected.HandleFunc("/upload", s.UploadHandler).Methods("POST")
 
 	// Fetch files
-	r.HandleFunc("/files", s.FileHandler).Methods("POST")
+	protected.HandleFunc("/files", s.FileHandler).Methods("POST")
 
 	// Preview organized file structure
-	r.HandleFunc("/organize/preview", s.PreviewHandler).Methods("POST")
+	protected.HandleFunc("/organize/preview", s.PreviewHandler).Methods("POST")
 
 	// Receive target data
-	r.HandleFunc("/target", s.TargetHandler).Methods("POST")
+	protected.HandleFunc("/target", s.TargetHandler).Methods("POST")
 
 	// Receive rule data
-	r.HandleFunc("/rule", s.RuleHandler).Methods("POST")
+	protected.HandleFunc("/rule", s.RuleHandler).Methods("POST")
 
 	// Return preview object based on ruleset
-	r.HandleFunc("/preview", s.PreviewHandler).Methods("POST")
+	protected.HandleFunc("/preview", s.PreviewHandler).Methods("POST")
 
-	// Return zip file of evaluation result
-	r.HandleFunc("/download/zip", s.DownloadZipHandler).Methods("POST")
+	// return zip file of evaluation result
+	protected.HandleFunc("/download/zip", s.DownloadZipHandler).Methods("POST")
 
 	/*
 		Add all handlers here...
@@ -64,7 +69,7 @@ func (s *Server) BuildRouter() *mux.Router {
 	// Add health check
 	r.HandleFunc("/health", s.HealthHandler).Methods("GET")
 	// Add user account endpoint
-	r.HandleFunc("/user", s.UserHandler).Methods("POST")
+	//r.HandleFunc("/user", s.UserHandler).Methods("POST")
 	/*
 		Add all handlers here...
 	*/

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
+	"github.com/sam8beard/reorg/internal/auth/middleware"
 	"github.com/schollz/progressbar/v3"
 	"io"
 	"log"
@@ -23,6 +24,14 @@ type FileMeta struct {
 }
 
 func (s *Server) UploadHandler(w http.ResponseWriter, r *http.Request) {
+	// Determine whether request came from a guest or registered user
+	//userID := r.Context().Value(middleware.CtxKeyUserID).(string)
+	//isGuest := r.Context().Value(middleware.CtxKeyGuest).(bool)
+
+	// Should print true or guest
+	log.Println(r.Context().Value(middleware.CtxKeyGuest))
+	log.Println(r.Context())
+
 	// Generate new upload UUID
 	uploadUUID := uuid.New()
 

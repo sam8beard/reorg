@@ -1,14 +1,17 @@
 package main
 
 import (
+	"os"
 	//"embed"
 	"github.com/sam8beard/reorg/internal/database/pgsql"
 	"github.com/sam8beard/reorg/internal/obj-store/minio"
 	// "github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"github.com/sam8beard/reorg/internal/app"
+	"github.com/sam8beard/reorg/internal/auth"
 	//"io/fs"
 	"log"
+	"time"
 )
 
 /* Development vars */
@@ -107,13 +110,20 @@ func main() {
 		log.Panicf("could not load environment variables: %v", err)
 	}
 
-	// Add config for prod
+	// JWT service for auth
+	jwtSecretKey := os.Getenv("JWT_SECRET")
+	jwtService := auth.NewJWTService(jwtSecretKey, time.Hour*24)
+
+	// Database and object store configs
 	dbConfig := pgsql.Config{}
 	minioConfig := minio.Config{}
+
+	// Database and object store connections
 	db := pgsql.NewConnection(&dbConfig)
 	minio := minio.NewConnection(&minioConfig)
 
-	server := app.NewServer(db, minio)
+	// Make server
+	server := app.NewServer(jwtService, db, minio)
 
 	server.RunDev()
 	//runProd()

@@ -1,5 +1,6 @@
 export * from './health.js';
 export * from './user.js';
+export * from './guest.js';
 export * from './upload.js';
 export * from './files.js';
 export * from './rule.js';
