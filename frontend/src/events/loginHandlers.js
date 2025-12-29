@@ -51,19 +51,29 @@ async function onLoginSubmit(root, e) {
 	const username = form.elements.username.value;
 	const password = form.elements.password.value;
 	
-	const loginInfo = {
-		"username": username,
+	const loginRequest = {
+		"usernameOrEmail": username,
 		"password": password,
 	};
 	
 	// Fetch user from backend
-	const userData = await fetchUser(loginInfo);
-	
+	const response = await fetchUser(loginRequest);
+	console.log(response);	
+
 	// If user does not exist, update state to notify login page and rerender with message
-	if (userData.error) {
-		store.loginError = userData.error
+	if (response.error) {
+		store.loginError = response.error;
+		return;
 	// If user does exist, show home page for respective user
 	} else {
-		showHome(userData)
+		console.log("Successfully fetched existing user");
+		console.log(response);
+		sessionStorage.setItem('authToken', response.token);
+		sessionStorage.setItem('userID', response.user.userID);
+		store.identity.type = 'user';
+		store.identity.userID = response.user.userID;
+		store.identity.sessionID = response.token;
+		console.log(store.identity);
+		showHome(store.identity)
 	}
 }

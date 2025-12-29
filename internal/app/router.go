@@ -20,7 +20,7 @@ func (s *Server) BuildRouterDev() *mux.Router {
 
 	// Public routes
 	r.HandleFunc("/auth/signup", s.SignupHandler).Methods("POST")
-	//r.HandleFunc("/auth/login", s.LoginHandler).Methods("POST")
+	r.HandleFunc("/auth/login", s.LoginHandler).Methods("POST")
 	r.HandleFunc("/auth/guest", s.GuestHandler).Methods("POST")
 
 	// Auth protected routes

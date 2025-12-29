@@ -14,7 +14,7 @@ export default function Login(root) {
 				<form id='login-form' method='post'>
 					<div id='username-container'>
 						<label class='' for='username'>
-							Username
+							Username or Email
 						</label>
 						<input type='text' id='username' name='username' placeholder='Username'>
 					</div>
@@ -41,6 +41,7 @@ export default function Login(root) {
 	// Attach handler for login
 	const loginForm = root.querySelector('#login-form');
 	attachLoginHandler(loginForm, root);
+
 }
 
 

@@ -2,10 +2,9 @@ package app
 
 import (
 	"archive/zip"
-	"context"
 	"encoding/json"
 	"github.com/minio/minio-go/v7"
-	"github.com/sam8beard/reorg/internal/auth/middleware"
+	//"github.com/sam8beard/reorg/internal/auth/middleware"
 	"github.com/sam8beard/reorg/internal/models"
 	"github.com/sam8beard/reorg/internal/rules"
 	"io"
@@ -16,8 +15,8 @@ import (
 
 func (s *Server) DownloadZipHandler(w http.ResponseWriter, r *http.Request) {
 	// Determine whether request came from a guest or registered user
-	userID := r.Context().Value(middleware.CtxKeyUserID).(string)
-	isGuest := r.Context().Value(middleware.CtxKeyGuest).(bool)
+	//userID := r.Context().Value(middleware.CtxKeyUserID).(string)
+	//isGuest := r.Context().Value(middleware.CtxKeyGuest).(bool)
 
 	// Defer close on request body
 	defer func() {
@@ -96,7 +95,7 @@ func (s *Server) DownloadZipHandler(w http.ResponseWriter, r *http.Request) {
 
 	// List all objects for this upload
 	for obj := range s.Minio.ListObjects(
-		context.Background(),
+		r.Context(),
 		s.MinioBucket,
 		opts,
 	) {
@@ -123,7 +122,7 @@ func (s *Server) DownloadZipHandler(w http.ResponseWriter, r *http.Request) {
 		// Download file body
 		getOpts := minio.GetObjectOptions{}
 		fileBody, err := s.Minio.GetObject(
-			context.Background(),
+			r.Context(),
 			s.MinioBucket,
 			key,
 			getOpts,

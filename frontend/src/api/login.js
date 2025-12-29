@@ -1,10 +1,10 @@
 import axios from 'axios';
 const DEV_API_BASE = "http://localhost:5173/api";
 
-export async function createAccount(signupRequest) {
-	const signupURL = DEV_API_BASE + "/auth/signup";
+export async function fetchUser(loginRequest) {
+	const loginURL = DEV_API_BASE + "/auth/login";
 	try {
-		const response = await axios.post(signupURL, signupRequest);
+		const response = await axios.post(loginURL, loginRequest);
 		console.log(response);
 		return response.data;
 	} catch (err) {

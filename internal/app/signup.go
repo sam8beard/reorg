@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"github.com/google/uuid"
 	"github.com/sam8beard/reorg/internal/models"
 	"golang.org/x/crypto/bcrypt"
 	"io"
@@ -60,14 +61,17 @@ func (s *Server) SignupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create user in database and get new user ID
-	var userID int
-	dbErr := s.DB.QueryRow(
+	userID := uuid.New().String()
+	_, dbErr := s.DB.Exec(
 		context.Background(),
-		`INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id`,
+		`INSERT INTO users (id, username, email, password_hash) VALUES ($1, $2, $3, $4)`,
+		userID,
 		signupRequest.Username,
 		signupRequest.Email,
 		hashedPassword,
-	).Scan(&userID)
+	)
+
+	// TODO: HANDLE ACCOUNT ALREADY EXISTS ERROR
 	if dbErr != nil {
 		log.Printf("error from db exec call: %v", dbErr)
 		w.Header().Set("Content-Type", "application/json")
@@ -99,5 +103,9 @@ func (s *Server) SignupHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Write response
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

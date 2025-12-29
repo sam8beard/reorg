@@ -1,7 +1,9 @@
 /* 
  * Handlers and utils for sign up button on landing page
  */
-import { showSignup } from '../navigation.js';
+import { showSignup, showHome } from '../navigation.js';
+import { createAccount } from '../api';
+import { store } from '../state.js';
 
 /*
  * Adds event for sign up button click on landing page.
@@ -16,18 +18,43 @@ export function attachSignupPageHandler(button, root) {
  * Adds event for sign up button on sign up page
  */
 export function attachSignupHandler(button, root) {
-	button.addEventListener('click', () => onSignupClick(root));
+	button.addEventListener('submit', (e) => onSignupSubmit(root, e));
 }
 /*
- * Handles sign up click
+ * Handles sign up submit
  *
  * Create account....etc. 
  */
-export async function onSignupClick(root) { 
+export async function onSignupSubmit(root, e) {
 	// Grab sign up field information from root
-	// const username = root.querySelector('#username').value;
-	// const password = root.querySelector('#password').value;
-	//
-	// Validate, check if user exists, create user, etc.
-	// 
+	e.preventDefault();
+	const form = e.target;
+	
+	// TODO: VALIDATE USER INPUT
+	const email = form.elements.email.value;
+	const username = form.elements.username.value;
+	const password = form.elements.password.value;
+
+	const signupRequest = {
+		"email": email,
+		"username": username,
+		"password": password,
+	}
+	
+	const response = await createAccount(signupRequest);
+	console.log(response);	
+
+	if (response.err) {
+		console.log(response);
+	} else {
+		console.log("Successfully registered user");
+		console.log(response);
+		sessionStorage.setItem('authToken', response.token);
+		sessionStorage.setItem('userID', response.user.userID);
+		store.identity.type = 'user';
+		store.identity.userID = response.user.userID;
+		store.identity.sessionID = response.token;
+		console.log(store.identity);
+		showHome(store.identity);
+	}
 }

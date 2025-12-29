@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"github.com/sam8beard/reorg/internal/auth/middleware"
 	"github.com/sam8beard/reorg/internal/models"
 	"io"
 	"log"
@@ -39,6 +40,10 @@ func (s *Server) SaveOrg(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
+	// Get user ID
+	userID := r.Context().Value(middleware.CtxKeyUserID).(string)
+	log.Printf("User ID: %s", userID)
+
 	// Read request body
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -66,6 +71,15 @@ func (s *Server) SaveOrg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Debugging
 	log.Printf("%+v", orgData)
+
+	// Data for entries
+	//rules := orgData.Rules
+	//ruleBindings := orgData.RuleBindings
+	//ruleSet := orgData.RuleSet
+
+	// Write all entries to database
+	log.Println("WRITE ENTRIES HERE")
 
 }
