@@ -5,7 +5,11 @@ const DEV_API_BASE = "http://localhost:5173/api";
 export async function downloadZip(organizeResult) {
 	const downloadURL = DEV_API_BASE + "/download/zip";
 	try {
+		const token = sessionStorage.getItem('authToken');
 		const response = await axios.post(downloadURL, organizeResult, { 
+			headers: {
+				'Authorization': `Bearer ${token}`
+			},
 			responseType: 'blob',
 		});
 		return response.data;

@@ -19,7 +19,7 @@ export async function onRuleSubmit(event, root) {
 		ruleJson = buildRuleFromForm(formData);
 
 		// Set active rule in state
-		store.activeRule = ruleJson.ruleUUID;
+		store.activeRule = ruleJson.ruleID;
 
 		// Add rule to state
 		addRule(ruleJson);
@@ -35,7 +35,7 @@ export async function onRuleSubmit(event, root) {
 
 		// Get preview object from backend using ruleset object
 		store.preview = await getPreviewJson(ruleSet);
-	
+				
 		// Debugging 
 		console.log(JSON.stringify(store.preview, null, 2));
 		
@@ -52,27 +52,27 @@ export async function onRuleSubmit(event, root) {
 /* Builds ruleset object from current state */
 function buildRuleSet() {
 	const ruleSet = {
-		"uploadUUID": store.upload.uploadUUID,
+		"uploadID": store.upload.uploadID,
 		"files": {},
 		"targets": {}
 	};
 	
 	// Populate files object
 	for (let file of store.upload.files) {
-		ruleSet.files[file.fileUUID] = file;
+		ruleSet.files[file.fileID] = file;
 	}
 
 	// Populate targets object using rule bindings
 	for (let binding of store.ruleBindings) {
-		const ruleUUID = binding.ruleUUID;
-		const targetUUID = binding.targetUUID;
-		console.log("Target UUID: ", targetUUID);
-		console.log("ACTIVE target UUID: ", store.activeTarget.targetUUID);
+		const ruleID = binding.ruleID;
+		const targetID = binding.targetID;
+		console.log("Target ID: ", targetID);
+		console.log("ACTIVE target ID: ", store.activeTarget.targetID);
 		// Get rule referenced in binding (should be unique)
 		let ruleToAdd;
 		for (let rule of store.rules) {
 			// We have found the matching rule
-			if (rule.ruleUUID === ruleUUID) {
+			if (rule.ruleID === ruleID) {
 				ruleToAdd = rule;
 				console.log("Rule to add set: ", ruleToAdd);
 			}
@@ -82,7 +82,7 @@ function buildRuleSet() {
 		let targetToAdd;
 		for (let target of store.targets) {
 			console.log("Firing in target loop");
-			if (target.targetUUID === targetUUID) {
+			if (target.targetID === targetID) {
 				targetToAdd = target;
 				console.log("Target to add set: ", targetToAdd);
 			}
@@ -90,13 +90,13 @@ function buildRuleSet() {
 	
 		// Make new target member with binded rule and target data
 		const newTarget = {
-			"targetUUID": targetToAdd.targetUUID,
+			"targetID": targetToAdd.targetID,
 			"targetName": targetToAdd.targetName,
 			"rule": ruleToAdd
 		}
 		
 		// Populate targets list in ruleset
-		ruleSet.targets[newTarget.targetUUID] = newTarget;
+		ruleSet.targets[newTarget.targetID] = newTarget;
 	}
 	
 	return ruleSet;
@@ -112,7 +112,7 @@ function addRule(rule) {
 function addRuleBinding(rule) {
 	store.ruleBindings = [
 		...store.ruleBindings,
-		{ "ruleUUID": rule.ruleUUID, "targetUUID": store.activeTarget.targetUUID }
+		{ "ruleID": rule.ruleID, "targetID": store.activeTarget.targetID }
 	];
 }
 
@@ -126,8 +126,8 @@ function buildRuleFromForm(formData) {
 	let unitProvided = false;
 
 	const ruleJson = { 
-		"uploadUUID": store.upload.uploadUUID,
-		"ruleUUID": crypto.randomUUID(),
+		"uploadID": store.upload.uploadID,
+		"ruleID": crypto.randomUUID(),
 		"ruleName": null,
 		"activeConditions": {
 			"extension": false, 
@@ -159,7 +159,7 @@ function buildRuleFromForm(formData) {
 			},
 		},
 		"then": {
-			"move_to": store.activeTarget.targetUUID
+			"move_to": store.activeTarget.targetID
 		}
 	};
 
@@ -317,17 +317,17 @@ function isDuplicate(ruleJson) {
 	//
 	// Current rule conditions
 	const newRuleConditions = ruleJson.when;
-	// Upload UUID associated with rule
-	const newRuleUploadUUID = ruleJson.uploadUUID;
+	// Upload ID associated with rule
+	const newRuleUploadID = ruleJson.uploadID;
 
 	// Iterate through all rules
 	for (let rule of store.rules) {
 
-		let ruleUploadUUID = rule.uploadUUID;
+		let ruleUploadID = rule.uploadID;
 		let ruleConditions = rule.when;
 		
 		// Rule is associated with the same upload
-		if (newRuleUploadUUID === ruleUploadUUID) {
+		if (newRuleUploadID === ruleUploadID) {
 			// Conditions are deeply equal
 			if (_.isEqual(newRuleConditions, ruleConditions)) return true;
 		}

@@ -11,7 +11,9 @@ import (
 )
 
 func (s *Server) PreviewHandler(w http.ResponseWriter, r *http.Request) {
-	// Defer close on request body
+	// Debugging
+	log.Println("Preview endpoint firing")
+	// Defer close request body
 	defer func() {
 		if closeErr := r.Body.Close(); closeErr != nil {
 			log.Fatalf("could not close request body: %v", closeErr)
@@ -49,8 +51,8 @@ func (s *Server) PreviewHandler(w http.ResponseWriter, r *http.Request) {
 	// Fetch metadata for each file from files table
 	metadataRows, dbErr := s.DB.Query(
 		context.Background(),
-		"SELECT upload_uuid, file_uuid, name, size, mime_type, original_timestamp FROM files WHERE upload_uuid = $1",
-		ruleSet.UploadUUID,
+		"SELECT upload_id, id, name, size, mime_type, original_timestamp FROM files WHERE upload_id = $1",
+		ruleSet.UploadID,
 	)
 	if dbErr != nil {
 		log.Printf("error from db query call: %v", dbErr)
@@ -69,8 +71,8 @@ func (s *Server) PreviewHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Scanning row...")
 		var md models.FileMetadata
 		dbErr := metadataRows.Scan(
-			&md.UploadUUID,
-			&md.FileUUID,
+			&md.UploadID,
+			&md.FileID,
 			&md.FileName,
 			&md.Size,
 			&md.MimeType,
@@ -92,8 +94,8 @@ func (s *Server) PreviewHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("File metadata: %+v\n\n", md)
 
 		// Store metadata for file
-		fileUUID := md.FileUUID
-		fileMetadata[fileUUID] = md
+		fileID := md.FileID
+		fileMetadata[fileID] = md
 	}
 
 	// Get evaluation result
@@ -146,6 +148,8 @@ func (s *Server) PreviewHandler(w http.ResponseWriter, r *http.Request) {
 	//	return
 	//}
 
+	// Debugging
+	rules.LogEvalResult(evalResult)
 	// Return evaluation result
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

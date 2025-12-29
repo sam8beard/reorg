@@ -7,10 +7,11 @@ import { store } from '../state.js';
 
 export async function onOrganizePageClick(e, root) {
 	// Fetch files using upload ID for file preview on organize page
-	const uploadUUID = store.upload.uploadUUID
-	const response = await fetchFiles(uploadUUID);
+	const uploadID = store.upload.uploadID;
+	const response = await fetchFiles(uploadID);
+	// Add files to frontend state
 	for (let file of response) { 
-		addFile(file);	
+		addFile(file);
 	}
 	showOrganize();
 }
@@ -97,8 +98,8 @@ async function onCreateDirFormSubmit(event, createDirContainer) {
 	createDirContainer.querySelector('#create-dir-error').innerText = "";	
 
 	// Build new target object
-	const targetUUID = crypto.randomUUID();
-	const target = { "targetUUID": targetUUID, "targetName": targetName};
+	const targetID = crypto.randomUUID();
+	const target = { "targetID": targetID, "targetName": targetName};
 
 	// Update state with new target
 	addTarget(target);

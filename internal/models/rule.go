@@ -1,8 +1,8 @@
 package models
 
 type Rule struct {
-	UploadUUID       string          `json:"uploadUUID"`
-	RuleUUID         string          `json:"ruleUUID"`
+	UploadID         string          `json:"uploadID"`
+	RuleID           string          `json:"ruleID"`
 	RuleName         string          `json:"ruleName"`
 	ActiveConditions map[string]bool `json:"activeConditions"`
 	Conditions       Conditions      `json:"when"`

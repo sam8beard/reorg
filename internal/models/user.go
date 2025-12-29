@@ -1,15 +1,16 @@
 package models
 
+import ()
+
 type User struct {
 	ID       int    `json:"userID"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 }
-
 type Identity struct {
-	ID       int    `json:"id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	Type       string // "user" | "guest"
+	UserID     string // user ID or guest ID
+	SesssionID string // JWT
 }
 
 type Data struct {

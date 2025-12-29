@@ -9,7 +9,7 @@ import (
 )
 
 type Target struct {
-	TargetUUID string
+	TargetID   string
 	TargetName string
 }
 
@@ -29,20 +29,20 @@ func Evaluate(ruleSet *models.RuleSet, fileMetadata map[string]models.FileMetada
 		return nil, err
 	}
 
-	// Grab upload UUID, files, and targets from ruleset
-	uploadUUID := ruleSet.UploadUUID
+	// Grab upload ID, files, and targets from ruleset
+	uploadID := ruleSet.UploadID
 	files := ruleSet.Files
 	targets := ruleSet.Targets
 
 	// Debugging
-	log.Printf("Upload UUID: \n%s\n\n", uploadUUID)
+	log.Printf("Upload ID: \n%s\n\n", uploadID)
 	log.Printf("Files list: \n%+v\n\n", files)
 	log.Printf("Targets list: \n%+v\n\n", targets)
 
 	// Initialize evaluation result object
 	evalResult := models.EvaluationResult{
-		UploadUUID: uploadUUID,
-		Folders:    make(map[string]*models.Folder, 0),
+		UploadID: uploadID,
+		Folders:  make(map[string]*models.Folder, 0),
 		Unmatched: models.UnmatchedFolder{
 			Name:  "unsorted-files",
 			Files: make([]models.File, 0),
@@ -50,9 +50,9 @@ func Evaluate(ruleSet *models.RuleSet, fileMetadata map[string]models.FileMetada
 	}
 
 	// Iterate through files
-	for fileUUID := range files {
-		// Retrieve metadata for current file using fileUUID
-		md := fileMetadata[fileUUID]
+	for fileID := range files {
+		// Retrieve metadata for current file using file ID
+		md := fileMetadata[fileID]
 
 		// Target condition matches for current file
 		targetMatches := TargetMatches{}
@@ -73,12 +73,12 @@ func Evaluate(ruleSet *models.RuleSet, fileMetadata map[string]models.FileMetada
 		bestMatch := BestMatch{}
 
 		// Get target to add file to
-		bestMatchUUID, err := bestMatch.selectTarget(targets, targetMatches)
+		bestMatchID, err := bestMatch.selectTarget(targets, targetMatches)
 
 		// If this file does not match any target's rule
 		if err != nil {
 			unmatchedFile := models.File{
-				FileUUID: md.FileUUID,
+				FileID:   md.FileID,
 				FileName: md.FileName,
 			}
 			// Add file to unmatched/unsorted folder
@@ -89,7 +89,7 @@ func Evaluate(ruleSet *models.RuleSet, fileMetadata map[string]models.FileMetada
 		}
 
 		// Bind file to folder in evaluation result
-		bestMatch.bindFile(&evalResult, bestMatchUUID, md)
+		bestMatch.bindFile(&evalResult, bestMatchID, md)
 	}
 
 	// Return evaluation result
@@ -131,8 +131,8 @@ Returns an error if a the given file fails to match at least one condition for t
 func (tm *TargetMatches) getMatches(target models.Target, md models.FileMetadata) error {
 
 	// Keep track of current target and its conditions matched
-	currTargetUUID := target.TargetUUID
-	(*tm)[currTargetUUID] = 0
+	currTargetID := target.TargetID
+	(*tm)[currTargetID] = 0
 
 	// Get rule associated with target
 	rule := target.Rule
@@ -156,11 +156,11 @@ func (tm *TargetMatches) getMatches(target models.Target, md models.FileMetadata
 				if checkFileType(conditions, md) {
 					log.Println("match on file type")
 					// Condition met, increment counter for target
-					(*tm)[currTargetUUID]++
+					(*tm)[currTargetID]++
 				} else {
 					// Condition given and not met
 					// Disqualify current target and check next target
-					(*tm)[currTargetUUID] = 0
+					(*tm)[currTargetID] = 0
 					return errors.New("failed match on file type")
 				}
 			}
@@ -170,11 +170,11 @@ func (tm *TargetMatches) getMatches(target models.Target, md models.FileMetadata
 				if checkNameContains(conditions, md) {
 					log.Println("match on name contains")
 					// Condition met, increment counter for target
-					(*tm)[currTargetUUID]++
+					(*tm)[currTargetID]++
 				} else {
 					// Condition given and not met
 					// Disqualify current target and check next target
-					(*tm)[currTargetUUID] = 0
+					(*tm)[currTargetID] = 0
 					return errors.New("failed match on name contains")
 				}
 			}
@@ -184,11 +184,11 @@ func (tm *TargetMatches) getMatches(target models.Target, md models.FileMetadata
 				if checkSize(conditions, md) {
 					log.Println("match on size")
 					// Condition met, increment counter for target
-					(*tm)[currTargetUUID]++
+					(*tm)[currTargetID]++
 				} else {
 					// Condition given and not met
 					// Disqualify current target and check next target
-					(*tm)[currTargetUUID] = 0
+					(*tm)[currTargetID] = 0
 					return errors.New("failed match on size")
 				}
 			}
@@ -198,11 +198,11 @@ func (tm *TargetMatches) getMatches(target models.Target, md models.FileMetadata
 				if checkCreated(conditions, md) {
 					log.Println("match on created")
 					// Condition met, increment counter for target
-					(*tm)[currTargetUUID]++
+					(*tm)[currTargetID]++
 				} else {
 					// Condition given and not met
 					// Disqualify current target and check next target
-					(*tm)[currTargetUUID] = 0
+					(*tm)[currTargetID] = 0
 					return errors.New("failed match on date creation")
 				}
 			}
@@ -220,18 +220,18 @@ Returns an error if the file had no condition matches for any target
 */
 func (bm *BestMatch) selectTarget(targets map[string]models.Target, targetMatches map[string]int) (string, error) {
 	// Keep track of most specific and valid target and the greatest amount of conditions matched for any valid target
-	var bestMatchUUID string
+	var bestMatchID string
 	mostConditions := 0
 
 	// Iterate through target matches
-	for targetUUID, numMatched := range targetMatches {
+	for targetID, numMatched := range targetMatches {
 		// Get target name
-		targetName := targets[targetUUID].TargetName
+		targetName := targets[targetID].TargetName
 
 		// Create temp target
 		currentTarget := make(map[string]Target, 0)
-		currentTarget[targetUUID] = Target{
-			TargetUUID: targetUUID,
+		currentTarget[targetID] = Target{
+			TargetID:   targetID,
 			TargetName: targetName,
 		}
 
@@ -241,10 +241,10 @@ func (bm *BestMatch) selectTarget(targets map[string]models.Target, targetMatche
 			mostConditions = numMatched
 
 			// Select this target as the best matched so far
-			(*bm)[targetUUID] = currentTarget[targetUUID]
-			bestMatchUUID = targetUUID
+			(*bm)[targetID] = currentTarget[targetID]
+			bestMatchID = targetID
 
-		} else if numMatched == mostConditions && (numMatched != 0 && mostConditions != 0) && (currentTarget[targetUUID] != (*bm)[targetUUID]) {
+		} else if numMatched == mostConditions && (numMatched != 0 && mostConditions != 0) && (currentTarget[targetID] != (*bm)[targetID]) {
 			// TODO: WE MUST PREVENT THIS CASE ON RULE CREATION IN THE FRONTEND!!!!!
 			//
 			// When a rule is created, check if any other target's rule has the EXACT
@@ -261,34 +261,34 @@ func (bm *BestMatch) selectTarget(targets map[string]models.Target, targetMatche
 		return "", errors.New("no matches found")
 	}
 
-	return bestMatchUUID, nil
+	return bestMatchID, nil
 
 }
 
 /* Binds a file to a folder in the evaluation result using the best fit target */
-func (bm *BestMatch) bindFile(evalResult *models.EvaluationResult, bestMatchUUID string, md models.FileMetadata) {
+func (bm *BestMatch) bindFile(evalResult *models.EvaluationResult, bestMatchID string, md models.FileMetadata) {
 	// Check if a folder corresponding to the best match target exists already
 	// If not, create new folder
-	if _, ok := evalResult.Folders[bestMatchUUID]; !ok {
+	if _, ok := evalResult.Folders[bestMatchID]; !ok {
 		// Create new folder
 		newFolder := models.Folder{
-			TargetUUID: bestMatchUUID,
-			TargetName: (*bm)[bestMatchUUID].TargetName,
+			TargetID:   bestMatchID,
+			TargetName: (*bm)[bestMatchID].TargetName,
 			Files:      make([]models.File, 0),
 		}
 		// Add folder to eval result
-		evalResult.Folders[bestMatchUUID] = &newFolder
+		evalResult.Folders[bestMatchID] = &newFolder
 
 	}
 
 	// Create matched file to add the matching folder
 	matchedFile := models.File{
-		FileUUID: md.FileUUID,
+		FileID:   md.FileID,
 		FileName: md.FileName,
 	}
 
 	// Bind file to corresponding folder
-	evalResult.Folders[bestMatchUUID].Files = append(evalResult.Folders[bestMatchUUID].Files, matchedFile)
+	evalResult.Folders[bestMatchID].Files = append(evalResult.Folders[bestMatchID].Files, matchedFile)
 }
 
 /* Checks if file type condition is met */

@@ -172,7 +172,8 @@ export async function onFileSubmit(e, root) {
 
 		// Use upload ID returned from backend response
 		console.log("Firing in uploadHandlers: ", response);
-		store.upload.uploadUUID = response;
+		store.upload.uploadID = response;
+		console.log(store.upload.uploadID);
 		form.reset();
 	}
 

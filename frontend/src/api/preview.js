@@ -5,7 +5,13 @@ const DEV_API_BASE = "http://localhost:5173/api";
 export async function getPreviewJson(ruleSet) { 
 	const previewURL = DEV_API_BASE + "/preview";
 	try {
-		const response = await axios.post(previewURL, ruleSet);
+		const token = sessionStorage.getItem('authToken');
+		const response = await axios.post(previewURL, ruleSet, {
+			headers: {
+				'Authorization': `Bearer ${token}`
+			},
+		});
+		console.log(response);
 		return response.data;
 	} catch(err) { 
 		if (err.response) {

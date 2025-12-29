@@ -2,12 +2,18 @@ import axios from 'axios';
 const DEV_API_BASE = "http://localhost:5173/api";
 
 /*
- * Fetch files using upload UUID
+ * Fetch files using upload ID
  */
-export async function fetchFiles(uploadUUID) { 
+export async function fetchFiles(uploadID) { 
 	const filesURL = DEV_API_BASE + "/files";
 	try { 
-		const response = await axios.post(filesURL, uploadUUID);
+		const token = sessionStorage.getItem('authToken');
+		const response = await axios.post(filesURL, uploadID, {
+			headers: {
+				'Authorization': `Bearer ${token}`
+			}
+		});
+		console.log(response);
 		return response.data;
 	} catch (err) {
 		if (err.response) { 

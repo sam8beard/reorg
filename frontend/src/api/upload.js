@@ -16,6 +16,7 @@ export async function uploadFileForm(formData, progressBar) {
 				progressBar.style.width = percent + '%';
 			}
 		});
+		console.log(response);
 		return response.data;
 
 	} catch (err) { 

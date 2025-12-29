@@ -9,7 +9,7 @@ import (
 )
 
 type TargetData struct {
-	TargetUUID string `json:"targetUUID"`
+	TargetID   string `json:"targetID"`
 	TargetName string `json:"targetName"`
 }
 
@@ -45,18 +45,18 @@ func (s *Server) TargetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// WORKING: properly receiving target info
-	log.Printf("Target UUID: %s | Target Name: %s", targetData.TargetUUID, targetData.TargetName)
+	log.Printf("Target ID: %s | Target Name: %s", targetData.TargetID, targetData.TargetName)
 
 	// Insert row in targets table and retrieve newly created id
 	var targetId int
 	dbErr := s.DB.QueryRow(
 		context.Background(),
 		`
-		INSERT INTO targets (target_uuid, name, user_id) 
+		INSERT INTO targets (target_id, name, user_id) 
 		VALUES ($1, $2, NULL) 
 		RETURNING id
 		`,
-		targetData.TargetUUID,
+		targetData.TargetID,
 		targetData.TargetName,
 	).Scan(&targetId)
 	if dbErr != nil {

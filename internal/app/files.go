@@ -4,18 +4,24 @@ import (
 	"context"
 	"encoding/json"
 	//"github.com/minio/minio-go/v7"
+	"github.com/sam8beard/reorg/internal/auth/middleware"
 	"io"
 	"log"
 	"net/http"
 )
 
 type FileInfo struct {
-	Name     string `json:"fileName"`
-	FileUUID string `json:"fileUUID"`
+	Name   string `json:"fileName"`
+	FileID string `json:"fileID"`
 }
 
 /* Get files that match a upload id in request */
 func (s *Server) FileHandler(w http.ResponseWriter, r *http.Request) {
+	// Determine whether request came from a guest or registered user
+	//userID := r.Context().Value(middleware.CtxKeyUserID).(string)
+	isGuest := r.Context().Value(middleware.CtxKeyGuest).(bool)
+	log.Printf("Guest session: %v", isGuest)
+
 	// Close request body
 	defer func() {
 		if closeErr := r.Body.Close(); closeErr != nil {
@@ -36,14 +42,14 @@ func (s *Server) FileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Convert body to int to access upload UUID
-	uploadUUID := string(body)
+	// Convert body to int to access upload ID
+	uploadID := string(body)
 
 	// Use upload ID to query all s3_keys of matching rows in files table
 	fileRows, dbErr := s.DB.Query(
 		context.Background(),
-		"SELECT name, file_uuid FROM files WHERE upload_uuid = $1",
-		uploadUUID,
+		"SELECT name, id FROM files WHERE upload_id = $1",
+		uploadID,
 	)
 	if dbErr != nil {
 		log.Printf("error from db query call: %v", dbErr)
@@ -63,7 +69,7 @@ func (s *Server) FileHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Scanning row...")
 		var f FileInfo
 
-		if dbErr := fileRows.Scan(&f.Name, &f.FileUUID); dbErr != nil {
+		if dbErr := fileRows.Scan(&f.Name, &f.FileID); dbErr != nil {
 			log.Printf("error scanning value from row: %v", dbErr)
 			w.Header().Set("Content-Type", "application/json")
 			http.Error(w, dbErr.Error(), http.StatusInternalServerError)

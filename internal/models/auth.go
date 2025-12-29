@@ -18,5 +18,5 @@ type AuthResponse struct {
 
 type AuthGuestResponse struct {
 	Token   string `json:"token"`
-	GuestID string `json:"id"`
+	GuestID string `json:"guestID"`
 }

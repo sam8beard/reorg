@@ -4,23 +4,27 @@
 
 // Initial state 
 const initialState = {
-	user: null,
-	isLoggedIn: false,
-	currentPage: 'landing',
-	upload: {
-		uploadUUID: null,
+	identity: {
+		type: null,
+		userID: null,
 		sessionID: null,
-		// { fileUUID, fileName }
-		files: []
+	},
+
+	currentPage: 'landing',
+
+	upload: {
+		uploadID: null,
+		// { fileID, fileName }
+		files: [],
 	},
 	
-	// { targetUUID, targetName } 
+	// { targetID, targetName } 
 	targets: [],
 
-	// { ruleUUID, name, when: {}, then: {} }
+	// { ruleID, name, when: {}, then: {} }
 	rules: [],
 
-	// { ruleUUID, targetUUID }
+	// { ruleID, targetID }
 	ruleBindings: [],
 
 	// UI state

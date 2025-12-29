@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/minio/minio-go/v7"
+	"github.com/sam8beard/reorg/internal/auth/middleware"
 	"github.com/sam8beard/reorg/internal/models"
 	"github.com/sam8beard/reorg/internal/rules"
 	"io"
@@ -14,6 +15,10 @@ import (
 )
 
 func (s *Server) DownloadZipHandler(w http.ResponseWriter, r *http.Request) {
+	// Determine whether request came from a guest or registered user
+	userID := r.Context().Value(middleware.CtxKeyUserID).(string)
+	isGuest := r.Context().Value(middleware.CtxKeyGuest).(bool)
+
 	// Defer close on request body
 	defer func() {
 		if closeErr := r.Body.Close(); closeErr != nil {
@@ -52,10 +57,10 @@ func (s *Server) DownloadZipHandler(w http.ResponseWriter, r *http.Request) {
 	// Debugging
 	rules.LogEvalResult(&fileStructure)
 
-	// Get upload UUID
-	uploadUUID := fileStructure.UploadUUID
+	// Get upload ID
+	uploadID := fileStructure.UploadID
 
-	// Keep track of folder names to folder UUIDs for db retrieval
+	// Keep track of folder names to folder IDs for db retrieval
 	folderMap := make(map[string]string, 0)
 	fileMap := make(map[string]string, 0)
 
@@ -63,21 +68,21 @@ func (s *Server) DownloadZipHandler(w http.ResponseWriter, r *http.Request) {
 	folders := fileStructure.Folders
 	for _, folder := range folders {
 
-		targetUUID := folder.TargetUUID
+		targetID := folder.TargetID
 		folderName := folder.TargetName
 
 		// Track folder
-		folderMap[targetUUID] = folderName
+		folderMap[targetID] = folderName
 
-		// Map file UUID to target UUID
+		// Map file ID to target ID
 		for _, file := range folder.Files {
-			fileMap[file.FileUUID] = targetUUID
+			fileMap[file.FileID] = targetID
 		}
 	}
 
 	// Get file metadata needed for download
 	opts := minio.ListObjectsOptions{
-		Prefix:       uploadUUID,
+		Prefix:       uploadID,
 		WithMetadata: true,
 		Recursive:    true,
 	}
@@ -107,13 +112,13 @@ func (s *Server) DownloadZipHandler(w http.ResponseWriter, r *http.Request) {
 		// File name
 		fileName := obj.UserMetadata["X-Amz-Meta-Original-File-Name"]
 
-		// File UUID
-		fileUUID := obj.UserMetadata["X-Amz-Meta-File-Uuid"]
+		// File ID
+		fileID := obj.UserMetadata["X-Amz-Meta-File-Id"]
 
-		// Get target UUID that we mapped to this file
-		targetUUID := fileMap[fileUUID]
-		// Get folder name that we mapped to this target UUID
-		folderName := folderMap[targetUUID]
+		// Get target ID that we mapped to this file
+		targetID := fileMap[fileID]
+		// Get folder name that we mapped to this target ID
+		folderName := folderMap[targetID]
 
 		// Download file body
 		getOpts := minio.GetObjectOptions{}

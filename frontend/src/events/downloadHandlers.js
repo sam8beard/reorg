@@ -1,5 +1,6 @@
-import { downloadZip } from '../api';
+import { downloadZip, saveOrgData } from '../api';
 import { Spinner } from 'spin.js';
+import { store } from '../state.js';
 
 const spinnerOpts = {
 	lines: 10, // The number of lines to draw
@@ -75,5 +76,36 @@ export async function onDownloadClick(e, container, fileStructure) {
 		const btn = document.querySelector('#download-zip-btn');
 		btn.innerText = 'Download your organized files';
 		btn.disabled = false;
+
 	}
+	
+	// If registered user, send ruleset information to backend for persistent storage
+	if (store.identity.type === 'user') {
+		console.log("Registered user detected, saving org data");
+		const orgData = buildOrgData()
+		try {
+			const response = await saveOrgData(orgData);
+		} catch(err) {
+			console.log(err);
+		}
+	}
+}
+
+/* Builds registered user organizational data for persistent storage */
+function buildOrgData() {
+
+	const ruleSet = {
+		uploadID: store.upload.uploadID,
+		files: store.upload.files,
+		targets: store.targets,
+	};
+
+	const orgData = {
+		rules: store.rules,
+		ruleBindings: store.ruleBindings,
+		ruleSet: ruleSet,
+	};
+
+	return orgData;
+
 }

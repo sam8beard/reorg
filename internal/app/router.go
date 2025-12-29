@@ -49,8 +49,11 @@ func (s *Server) BuildRouterDev() *mux.Router {
 	// Return preview object based on ruleset
 	protected.HandleFunc("/preview", s.PreviewHandler).Methods("POST")
 
-	// return zip file of evaluation result
+	// Return zip file of evaluation result
 	protected.HandleFunc("/download/zip", s.DownloadZipHandler).Methods("POST")
+
+	// Write user file organization info to database
+	protected.HandleFunc("/organize/save", s.SaveOrg).Methods("POST")
 
 	/*
 		Add all handlers here...

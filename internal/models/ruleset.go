@@ -5,13 +5,13 @@ import (
 )
 
 type RuleSet struct {
-	UploadUUID string            `json:"uploadUUID"`
-	Files      map[string]File   `json:"files"`
-	Targets    map[string]Target `json:"targets"`
+	UploadID string            `json:"uploadID"`
+	Files    map[string]File   `json:"files"`
+	Targets  map[string]Target `json:"targets"`
 }
 type FileMetadata struct {
-	UploadUUID  string
-	FileUUID    string
+	UploadID    string
+	FileID      string
 	FileName    string
 	Size        int64
 	MimeType    string
