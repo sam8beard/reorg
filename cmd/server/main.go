@@ -2,7 +2,7 @@ package main
 
 import (
 	//"embed"
-	"github.com/sam8beard/reorg/internal/db/pgsql"
+	"github.com/sam8beard/reorg/internal/database/pgsql"
 	"github.com/sam8beard/reorg/internal/obj-store/minio"
 	// "github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -107,8 +107,11 @@ func main() {
 		log.Panicf("could not load environment variables: %v", err)
 	}
 
-	db := pgsql.Init()
-	minio := minio.Init()
+	// Add config for prod
+	dbConfig := pgsql.Config{}
+	minioConfig := minio.Config{}
+	db := pgsql.NewConnection(&dbConfig)
+	minio := minio.NewConnection(&minioConfig)
 
 	server := app.NewServer(db, minio)
 

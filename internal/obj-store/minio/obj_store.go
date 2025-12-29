@@ -10,7 +10,13 @@ import (
 
 var Client *minio.Client
 
-func Init() *minio.Client {
+type Config struct {
+	Endpoint  string
+	AccessKey string
+	SecretKey string
+}
+
+func NewConnection(config *Config) *minio.Client {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("could not load env vars: %v", err)
 	}

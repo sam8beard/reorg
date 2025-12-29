@@ -16,22 +16,37 @@ func (s *Server) BuildRouterDev() *mux.Router {
 
 	// Health check
 	r.HandleFunc("/health", s.HealthHandler).Methods("GET")
+
+	// Sign up
+	//r.HandleFunc("/auth/signup", s.SignupHandler).Methods("POST")
+
+	// Log in
+	//r.HandleFunc("/auth/login", s.LoginHandler).Methods("POST")
+
 	// Get user data
 	r.HandleFunc("/user", s.UserHandler).Methods("POST")
+
 	// Receive file uploads
 	r.HandleFunc("/upload", s.UploadHandler).Methods("POST")
+
 	// Fetch files
 	r.HandleFunc("/files", s.FileHandler).Methods("POST")
+
 	// Preview organized file structure
 	r.HandleFunc("/organize/preview", s.PreviewHandler).Methods("POST")
+
 	// Receive target data
 	r.HandleFunc("/target", s.TargetHandler).Methods("POST")
+
 	// Receive rule data
 	r.HandleFunc("/rule", s.RuleHandler).Methods("POST")
+
 	// Return preview object based on ruleset
 	r.HandleFunc("/preview", s.PreviewHandler).Methods("POST")
+
 	// Return zip file of evaluation result
 	r.HandleFunc("/download/zip", s.DownloadZipHandler).Methods("POST")
+
 	/*
 		Add all handlers here...
 	*/

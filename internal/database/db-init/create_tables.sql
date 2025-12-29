@@ -60,15 +60,15 @@ CREATE TABLE rule_bindings (
 	target_name TEXT NOT NULL
 );
 
--- Jobs table
-CREATE TABLE jobs (
+-- Tasks table
+CREATE TABLE tasks (
 	id SERIAL PRIMARY KEY,
-	job_uuid UUID NOT NULL UNIQUE,
+	title VARCHAR(255) NOT NULL,
+	description TEXT,
+	task_uuid UUID NOT NULL UNIQUE,
 	user_id INTEGER REFERENCES users(id) NULL, -- nullable for guests
-	upload_id INTEGER REFERENCES uploads(id),
 	ruleset_id INTEGER REFERENCES rulesets(id),
-	status TEXT NOT NULL,
-	result_path TEXT,
+	status VARCHAR(50) NOT NULL,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	updated_at TIMESTAMPTZ DEFAULT NOW()
 );

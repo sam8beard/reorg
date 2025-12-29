@@ -53,4 +53,4 @@ uploads
 # Mounts
 internal/obj-store/minio-data/
 internal/pgadmin/pgadmin-data/
-internal/db/pg-data/
+internal/database/pg-data/
