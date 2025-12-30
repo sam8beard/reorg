@@ -98,6 +98,7 @@ function buildOrgData() {
 		uploadID: store.upload.uploadID,
 		files: store.upload.files,
 		targets: store.targets,
+		ruleBindings: store.ruleBindings,
 	};
 
 	const orgData = {

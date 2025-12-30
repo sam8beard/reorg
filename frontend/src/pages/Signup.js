@@ -15,22 +15,27 @@ export default function Signup(root) {
 						<label class='' for='email'>
 							Email
 						</label>
-						<input type='text' id='email' name='email' placeholder='Email'>
+						<input type='text' id='email' name='email' placeholder='Email' required>
 					</div>
 					<div id='signup-username-container'>
 						<label class='' for='username'>
 							Username
 						</label>
-						<input type='text' id='username' name='username' placeholder='Username'>
+						<input type='text' id='username' name='username' placeholder='Username' required>
 					</div>
 					<div id='signup-password-container'>
 						<label class='' for='password'>
 							Password
 						</label>
-						<input type='text' id='password' name='password' placeholder='Password'>
+						<input type='text' id='password' name='password' placeholder='Password' required>
 					</div>
-					<div class='' id='signup-error-container'>
-						<p id='signup-error'></p>
+					<div id='signup-password-match-container'>
+						<label class='' for='passwordMatch'>
+							Enter your password again
+						</label>
+						<input type='text' id='password-match' name='passwordMatch' placeholder='Password (again)' required>
+					</div>
+					<div class='' id='form-error'>
 					</div>
 					<button type='submit' style='display:none'></button>
 				</form>

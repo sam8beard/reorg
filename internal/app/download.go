@@ -177,6 +177,7 @@ func (s *Server) DownloadZipHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	/*
+		TODO:
 		DONT FORGET TO WRITE UNSORTED FILES TOO
 	*/
 

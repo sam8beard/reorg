@@ -12,7 +12,7 @@ CREATE TABLE users (
 -- Uploads table
 CREATE TABLE uploads (
 	id UUID PRIMARY KEY,
-	user_id UUID REFERENCES users(id) NULL,
+	user_id UUID REFERENCES users(id) ON DELETE CASCADE NULL,
 	guest_id UUID UNIQUE NULL,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -32,19 +32,22 @@ CREATE TABLE files (
 -- Rulesets table
 CREATE TABLE rulesets (
 	id UUID PRIMARY KEY,
-	user_id UUID REFERENCES users(id) NULL, -- nullable for guests
-	name TEXT NOT NULL, 
+	user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+	ruleset_json JSONB NOT NULL,
+	-- Do we want to have upload_id as a foreign key, relate it to a specific upload?
+	upload_id UUID REFERENCES uploads(id) ON DELETE CASCADE,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Rules table
 CREATE TABLE rules (
 	id UUID PRIMARY KEY,
-	user_id UUID REFERENCES users(id) NULL,
+	user_id UUID REFERENCES users(id) ON DELETE CASCADE,
 	name TEXT NOT NULL,
 	conditions_json JSONB NOT NULL,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	UNIQUE (user_id, name)
+	-- For a given user, two rules cannot have the same name and logic
+	UNIQUE (user_id, name, conditions_json)
 );
 
 -- Rule bindings table
@@ -52,8 +55,10 @@ CREATE TABLE rule_bindings (
 	id UUID PRIMARY KEY,
 	ruleset_id UUID REFERENCES rulesets(id) ON DELETE CASCADE,
 	rule_id UUID REFERENCES rules(id) ON DELETE CASCADE,
-	target_id UUID NOT NULL UNIQUE,
-	target_name TEXT NOT NULL
+	target_id UUID NOT NULL,
+	target_name TEXT NOT NULL,
+	-- Each binding is unique to a target and a rule, this binding is unique to a ruleset
+	UNIQUE (ruleset_id, target_id, rule_id)
 );
 
 -- Tasks table
